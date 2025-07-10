@@ -2,24 +2,24 @@
 /**
  * Tests for token verifier.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Utils;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Utils;
 
-use RtCamp\OAuthLogin\Modules\Settings;
-use RtCamp\OAuthLogin\Tests\PrivateAccess;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Utils\TokenVerifier as Testee;
+use DaxHurley\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Tests\PrivateAccess;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Utils\TokenVerifier as Testee;
 
 /**
  * Class TokenVerifierTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Utils\TokenVerifier
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Utils\TokenVerifier
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Utils
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Utils
  */
 class TokenVerifierTest extends TestCase {
 
@@ -28,7 +28,7 @@ class TokenVerifierTest extends TestCase {
 	/**
 	 * Object under test.
 	 *
-	 * @var \RtCamp\OAuthLogin\Utils\TokenVerifier
+	 * @var \DaxHurley\OAuthLogin\Utils\TokenVerifier
 	 */
 	private $testee;
 
@@ -60,7 +60,7 @@ class TokenVerifierTest extends TestCase {
 	 * @covers ::get_supported_algorithm
 	 */
 	public function testGetSupportedAlgorithmDefault() {
-		\WP_Mock::expectFilter( 'rtcamp.default_algorithm', OPENSSL_ALGO_SHA256, '' );
+		\WP_Mock::expectFilter( 'daxhurley.default_algorithm', OPENSSL_ALGO_SHA256, '' );
 		$expected = OPENSSL_ALGO_SHA256;
 		$algo = $this->testee::get_supported_algorithm();
 

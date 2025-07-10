@@ -1,27 +1,34 @@
 {
-	"name": "rtcamp/login-with-oauth",
+	"name": "daxhurley/wp-oauth-login",
 	"description": "WordPress plugin to let users login with oauth.",
 	"license": "GPL 2.0",
 	"authors": [
 		{
 			"name": "rtCamp",
-			"email": "contact@rtcamp.com",
+			"email": "contact@daxhurley.com",
 			"homepage": "https://rtcamp.com/",
-			"role": "Developer"
+			"role": "Orginal Plugin Developer"
 		},
 		{
 			"name": "Utkarsh Patel",
-			"email": "itismeutkarsh@gmail.com"
+			"email": "itismeutkarsh@gmail.com",
+			"role": "Original Plugin Developer"
 		},
 		{
 			"name": "Paul Clark",
-			"role": "Developer"
+			"role": "Original Plugin Developer"
 		},
 		{
 			"name": "Ankit Gade",
-			"email": "ankit.gade@rtcamp.com",
+			"email": "ankit.gade@daxhurley.com",
 			"homepage": "https://iamank.it/",
-			"role": "Developer"
+			"role": "Original Plugin Developer"
+		},
+		{
+			"name": "Dax Hurley",
+			"email": "dax.hurley@gmail.com",
+			"homepage": "https://github.com/dax-hurley",
+			"role": "Fork Developer"
 		}
 	],
 	"minimum-stability": "dev",
@@ -48,12 +55,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"RtCamp\\OAuthLogin\\": "src/"
+			"DaxHurley\\OAuthLogin\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"RtCamp\\OAuthLogin\\Tests\\": "tests/php"
+			"DaxHurley\\OAuthLogin\\Tests\\": "tests/php"
 		}
 	},
 	"scripts": {

@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Interfaces;
+namespace DaxHurley\OAuthLogin\Interfaces;
 
 /**
  * Interface Container

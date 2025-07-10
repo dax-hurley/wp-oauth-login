@@ -4,20 +4,20 @@
  * Description: Allow users to login/register via OAuth.
  * Version: 1.4.0
  * Author: rtCamp
- * Author URI: https://rtcamp.com
+ * Author URI: https://daxhurley.com
  * Text Domain: login-with-oauth
  * Domain Path: /languages
  * License: GPLv2+
  * Requires at least: 5.5
  * Requires PHP: 7.4
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin;
+namespace DaxHurley\OAuthLogin;
 
 use Pimple\Container as PimpleContainer;
 

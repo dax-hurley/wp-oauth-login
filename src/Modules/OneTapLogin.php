@@ -5,26 +5,26 @@
  * This class will be responsible for handling
  * OAuth's one tap login for web functioning.
  *
- * @package RtCamp\OAuthLogin\Modules
+ * @package DaxHurley\OAuthLogin\Modules
  * @since 1.0.16
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Modules;
+namespace DaxHurley\OAuthLogin\Modules;
 
 use Exception;
-use RtCamp\OAuthLogin\Utils\Authenticator;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Utils\Helper;
-use RtCamp\OAuthLogin\Interfaces\Module;
-use RtCamp\OAuthLogin\Utils\TokenVerifier;
-use function RtCamp\OAuthLogin\plugin;
+use DaxHurley\OAuthLogin\Utils\Authenticator;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Interfaces\Module;
+use DaxHurley\OAuthLogin\Utils\TokenVerifier;
+use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class OneTapLogin
  *
- * @package RtCamp\OAuthLogin\Modules
+ * @package DaxHurley\OAuthLogin\Modules
  */
 class OneTapLogin implements Module {
 	/**
@@ -94,7 +94,7 @@ class OneTapLogin implements Module {
 			add_action( 'login_enqueue_scripts', [ $this, 'one_tap_scripts' ] );
 			add_action( 'login_footer', [ $this, 'one_tap_prompt' ] );
 			add_action( 'wp_ajax_nopriv_validate_id_token', [ $this, 'validate_token' ] );
-			add_action( 'rtcamp.id_token_verified', [ $this, 'authenticate' ] );
+			add_action( 'daxhurley.id_token_verified', [ $this, 'authenticate' ] );
 		}
 	}
 
@@ -187,9 +187,9 @@ class OneTapLogin implements Module {
 			 *
 			 * @since 1.0.16
 			 */
-			do_action( 'rtcamp.id_token_verified' );
+			do_action( 'daxhurley.id_token_verified' );
 
-			$redirect_to   = apply_filters( 'rtcamp.oauth_default_redirect', admin_url() );
+			$redirect_to   = apply_filters( 'daxhurley.oauth_default_redirect', admin_url() );
 			$state         = Helper::filter_input( INPUT_POST, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null;    // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 

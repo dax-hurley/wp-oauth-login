@@ -5,22 +5,22 @@
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Tests\Unit;
+namespace DaxHurley\OAuthLogin\Tests\Unit;
 
 use WP_Mock;
-use RtCamp\OAuthLogin\Plugin;
-use RtCamp\OAuthLogin\Container;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Plugin as Testee;
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
+use DaxHurley\OAuthLogin\Plugin;
+use DaxHurley\OAuthLogin\Container;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Plugin as Testee;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Interfaces\Container as ContainerInterface;
 
 /**
  * Class PluginTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Plugin
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Plugin
  *
- * @package RtCamp\OAuthLogin\Tests\Unit
+ * @package DaxHurley\OAuthLogin\Tests\Unit
  */
 class PluginTest extends TestCase {
 
@@ -288,7 +288,7 @@ class PluginTest extends TestCase {
 
 		WP_Mock::expectActionAdded( 'init', [ $this->testee, 'load_translations' ] );
 		WP_Mock::expectActionAdded( 'plugin_action_links_' . plugin_basename( $this->testee->path ) . '/login-with-oauth.php', [ $this->testee, 'add_plugin_action_links' ] );
-		WP_Mock::expectFilter( 'rtcamp.oauth_login_modules', $this->testee->active_modules );
+		WP_Mock::expectFilter( 'daxhurley.oauth_login_modules', $this->testee->active_modules );
 
 		$this->testee->run();
 		$this->assertConditionsMet();
@@ -315,7 +315,7 @@ class PluginTest extends TestCase {
 		);
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			1,
 			function () {

@@ -5,21 +5,21 @@
  * This will manage the assets file (css/js)
  * for adding style and JS functionality.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since   1.0.0
  */
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Modules;
+namespace DaxHurley\OAuthLogin\Modules;
 
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use function RtCamp\OAuthLogin\plugin;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class Assets
  *
- * @package RtCamp\OAuthLogin\Modules
+ * @package DaxHurley\OAuthLogin\Modules
  */
 class Assets implements ModuleInterface {
 

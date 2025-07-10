@@ -7,23 +7,23 @@
  *
  * Particularly useful in FSE.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.2.3
  */
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Modules;
+namespace DaxHurley\OAuthLogin\Modules;
 
-use RtCamp\OAuthLogin\Utils\Helper;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Interfaces\Module;
-use function RtCamp\OAuthLogin\plugin;
+use DaxHurley\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Interfaces\Module;
+use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class Block.
  *
- * @package RtCamp\OAuthLogin\Modules
+ * @package DaxHurley\OAuthLogin\Modules
  */
 class Block implements Module {
 
@@ -128,7 +128,7 @@ class Block implements Module {
 		if (
 			$force_display ||
 			! is_user_logged_in() ||
-			apply_filters( 'rtcamp.oauth_login_button_display', false )
+			apply_filters( 'daxhurley.oauth_login_button_display', false )
 		) {
 			$markup = $this->markup(
 				[

@@ -2,26 +2,26 @@
 /**
  * Test for Authenticator class.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Utils;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Utils;
 
 use WP_Mock;
 use Mockery;
-use RtCamp\OAuthLogin\Utils\Helper;
-use RtCamp\OAuthLogin\Modules\Settings;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Utils\Authenticator as Testee;
+use DaxHurley\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Utils\Authenticator as Testee;
 
 /**
  * Class AuthenticatorTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Utils\Authenticator
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Utils\Authenticator
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 class AuthenticatorTest extends TestCase {
 
@@ -138,7 +138,7 @@ class AuthenticatorTest extends TestCase {
 		           ->once()
 		           ->withArgs( ['test'] );
 
-		WP_Mock::onFilter( 'rtcamp.oauth_register_user' )->with( $user )->reply( $wp_user );
+		WP_Mock::onFilter( 'daxhurley.oauth_register_user' )->with( $user )->reply( $wp_user );
 
 		$this->testee->authenticate( $user );
 		$this->assertConditionsMet();
@@ -221,7 +221,7 @@ class AuthenticatorTest extends TestCase {
 			100
 		);
 
-		WP_Mock::expectAction( 'rtcamp.oauth_user_created', 100, $user );
+		WP_Mock::expectAction( 'daxhurley.oauth_user_created', 100, $user );
 
 		$wp_user = Mockery::mock( \WP_User::class );
 
@@ -283,7 +283,7 @@ class AuthenticatorTest extends TestCase {
 			100
 		);
 
-		WP_Mock::expectAction( 'rtcamp.oauth_user_created', 100, $user );
+		WP_Mock::expectAction( 'daxhurley.oauth_user_created', 100, $user );
 
 		$wp_user = Mockery::mock( \WP_User::class );
 
@@ -346,7 +346,7 @@ class AuthenticatorTest extends TestCase {
 			100
 		);
 
-		WP_Mock::expectAction( 'rtcamp.oauth_user_created', 100, $user );
+		WP_Mock::expectAction( 'daxhurley.oauth_user_created', 100, $user );
 
 		$wp_user = Mockery::mock( \WP_User::class );
 

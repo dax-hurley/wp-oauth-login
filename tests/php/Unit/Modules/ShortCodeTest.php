@@ -5,23 +5,23 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Modules;
 
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Utils\Helper;
 use WP_Mock;
 use Mockery;
-use RtCamp\OAuthLogin\Modules\Shortcode as Testee;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Modules\Assets;
+use DaxHurley\OAuthLogin\Modules\Shortcode as Testee;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Modules\Assets;
 
 /**
  * Class ShortCodeTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Shortcode
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Modules\Shortcode
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Modules
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Modules
  */
 class ShortCodeTest extends TestCase {
 	/**
@@ -156,10 +156,10 @@ class ShortCodeTest extends TestCase {
 			false
 		);
 
-		WP_Mock::expectFilterAdded( 'rtcamp.oauth_redirect_url', [ $this->testee, 'redirect_url' ] );
+		WP_Mock::expectFilterAdded( 'daxhurley.oauth_redirect_url', [ $this->testee, 'redirect_url' ] );
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			1,
 			(object) [

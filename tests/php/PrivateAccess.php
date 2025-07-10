@@ -2,10 +2,10 @@
 /**
  * Trait to access/test private methods/properties.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 
-namespace RtCamp\OAuthLogin\Tests;
+namespace DaxHurley\OAuthLogin\Tests;
 
 use ReflectionClass;
 use ReflectionException;

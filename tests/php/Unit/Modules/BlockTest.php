@@ -5,23 +5,23 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Modules;
 
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Utils\Helper;
 use WP_Mock;
 use Mockery;
-use RtCamp\OAuthLogin\Modules\Block as Testee;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Modules\Assets;
+use DaxHurley\OAuthLogin\Modules\Block as Testee;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Modules\Assets;
 
 /**
  * Class BlockTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Block
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Modules\Block
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Modules
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Modules
  */
 class BlockTest extends TestCase {
 	/**
@@ -96,7 +96,7 @@ class BlockTest extends TestCase {
 		);
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			1,
 			function () use ( $path ) {
@@ -199,7 +199,7 @@ class BlockTest extends TestCase {
 		$path = dirname( __DIR__, 4 ) . '/templates/';
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			1,
 			function () use ( $path ) {
@@ -273,7 +273,7 @@ class BlockTest extends TestCase {
 		$path = dirname( __DIR__, 4 ) . '/templates/';
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			1,
 			function () use ( $path ) {

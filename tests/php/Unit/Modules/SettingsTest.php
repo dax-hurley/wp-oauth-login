@@ -5,19 +5,19 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Modules;
 
 use WP_Mock;
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Modules\Settings as Testee;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Modules\Settings as Testee;
 
 /**
  * Class SettingsTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Settings
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Modules\Settings
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Modules
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Modules
  */
 class SettingsTest extends TestCase {
 	/**

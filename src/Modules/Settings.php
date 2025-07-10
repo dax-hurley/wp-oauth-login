@@ -3,16 +3,16 @@
  * Register the settings under settings page and also
  * provide the interface to retrieve the settings.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
- * @author rtCamp <contact@rtcamp.com>
+ * @author rtCamp <contact@daxhurley.com>
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Modules;
+namespace DaxHurley\OAuthLogin\Modules;
 
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
 
 /**
  * Class Settings.
@@ -24,7 +24,7 @@ use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
  * @property bool|null one_tap_login
  * @property string    one_tap_login_screen
  *
- * @package RtCamp\OAuthLogin\Modules
+ * @package DaxHurley\OAuthLogin\Modules
  */
 class Settings implements ModuleInterface {
 

@@ -1,6 +1,6 @@
 # WP OAuth Login
 
-This is is a fork of [login with google](https://github.com/rtCamp/login-with-google) written by [rtCamp](https://rtcamp.com/), I have modified and extended the functionality for my own purposes to generically support any OAuth 2.0 provider. I created it to allow my site's users to authenticate with Clerk, which we are using for our existing web app.
+This is is a fork of [login with google](https://github.com/rtCamp/login-with-google) written by [rtCamp](https://daxhurley.com/), I have modified and extended the functionality for my own purposes to generically support any OAuth 2.0 provider. I created it to allow my site's users to authenticate with Clerk, which we are using for our existing web app.
 
 Licensed under the same GPL license as the original plugin, feel free to use it for whatever you want!
 
@@ -85,25 +85,25 @@ via [wp-cli](https://developer.wordpress.org/cli/commands/config/).
 
 | Filter | Description | Parameters |
 | --- | ----------- | --- |
-| `rtcamp.oauth_scope` | This filter can be used to filter existing scope used in OAuth Sign in. <br />You can ask for additional permission while user logs in. | <ul><li>`scope` - contains array of scopes.</li></ul>
-| `rtcamp.oauth_login_modules` | Filter out active modules before modules are initialized. | <ul><li>`active_modules` - contains array of active modules.</li></ul>
-| `rtcamp.oauth_login_button_display` | This filter is useful where we want to forcefully display login button, even when user is already logged-in in system. | <ul><li>`display` - contains a boolean value of whether to display the button or not.</li></ul>
-| `rtcamp.oauth_default_redirect` | Filter the default redirect URL in case redirect_to param is not available. <br />Default to admin URL. | <ul><li>`admin_url` - contains the admin URL address which is used as redirect URL by default.</li></ul>
-| `rtcamp.oauth_register_user` | Check if we need to register the user. | <ul><li>`user` - contains the user object from OAuth.</li></ul>
-| `rtcamp.oauth_client_args` | Filter the arguments for sending in query. <br />This is useful in cases for example: choosing the correct prompt. | <ul><li>`client_args` - contains the list of query arguments to send to OAuth OAuth.</li></ul>
-| `rtcamp.oauth_login_state` | Filters the state to pass to the OAuth API. | <ul><li>`state_data` - contains the default state data.</li></ul>
-| `rtcamp.default_algorithm` | Filters default algorithm for openssl signature verification | <ul><li>`default_algo` - Default algorithm.</li><li>`algo` - Algorithm from JWT header.</li></ul>
+| `daxhurley.oauth_scope` | This filter can be used to filter existing scope used in OAuth Sign in. <br />You can ask for additional permission while user logs in. | <ul><li>`scope` - contains array of scopes.</li></ul>
+| `daxhurley.oauth_login_modules` | Filter out active modules before modules are initialized. | <ul><li>`active_modules` - contains array of active modules.</li></ul>
+| `daxhurley.oauth_login_button_display` | This filter is useful where we want to forcefully display login button, even when user is already logged-in in system. | <ul><li>`display` - contains a boolean value of whether to display the button or not.</li></ul>
+| `daxhurley.oauth_default_redirect` | Filter the default redirect URL in case redirect_to param is not available. <br />Default to admin URL. | <ul><li>`admin_url` - contains the admin URL address which is used as redirect URL by default.</li></ul>
+| `daxhurley.oauth_register_user` | Check if we need to register the user. | <ul><li>`user` - contains the user object from OAuth.</li></ul>
+| `daxhurley.oauth_client_args` | Filter the arguments for sending in query. <br />This is useful in cases for example: choosing the correct prompt. | <ul><li>`client_args` - contains the list of query arguments to send to OAuth OAuth.</li></ul>
+| `daxhurley.oauth_login_state` | Filters the state to pass to the OAuth API. | <ul><li>`state_data` - contains the default state data.</li></ul>
+| `daxhurley.default_algorithm` | Filters default algorithm for openssl signature verification | <ul><li>`default_algo` - Default algorithm.</li><li>`algo` - Algorithm from JWT header.</li></ul>
 
 #### Actions
 
 | Action | Description | Parameters |
 | --- | ----------- | --- |
-| `rtcamp.oauth_login_services` | Define any additional services. | <ul><li>`container` - Container object.</li></ul>
-| `rtcamp.oauth_user_authenticated` | Fires once the user has been authenticated via OAuth OAuth. | <ul><li>`user` - User object.</li></ul>
-| `rtcamp.id_token_verified` | Do something when token has been verified successfully.<br />If we are here that means ID token has been verified.
-| `rtcamp.oauth_user_logged_in` | Fires once the user has been authenticated. | <ul><li>`user_wp` - WP User data object.</li><li>`user` - User data object returned by OAuth.</li></ul>
-| `rtcamp.oauth_user_created` | Fires once the user has been registered successfully. | <ul><li>`uid` - User ID</li><li>`user` - WP user object.</li></ul>
-| `rtcamp.login_with_oauth_exception` | Fires when an exception is raised during token verification. | <ul><li>`exception` - The exception which is being raised.</li></ul>
+| `daxhurley.oauth_login_services` | Define any additional services. | <ul><li>`container` - Container object.</li></ul>
+| `daxhurley.oauth_user_authenticated` | Fires once the user has been authenticated via OAuth OAuth. | <ul><li>`user` - User object.</li></ul>
+| `daxhurley.id_token_verified` | Do something when token has been verified successfully.<br />If we are here that means ID token has been verified.
+| `daxhurley.oauth_user_logged_in` | Fires once the user has been authenticated. | <ul><li>`user_wp` - WP User data object.</li><li>`user` - User data object returned by OAuth.</li></ul>
+| `daxhurley.oauth_user_created` | Fires once the user has been registered successfully. | <ul><li>`uid` - User ID</li><li>`user` - WP user object.</li></ul>
+| `daxhurley.login_with_oauth_exception` | Fires when an exception is raised during token verification. | <ul><li>`exception` - The exception which is being raised.</li></ul>
 
 ## Shortcode
 

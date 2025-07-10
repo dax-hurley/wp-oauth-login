@@ -4,20 +4,20 @@
  *
  * Setup and bootstrap everything from here.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin;
+namespace DaxHurley\OAuthLogin;
 
-use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
+use DaxHurley\OAuthLogin\Interfaces\Container as ContainerInterface;
 
 /**
  * Class Plugin.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 class Plugin {
 
@@ -104,7 +104,7 @@ class Plugin {
 		 *
 		 * @since 1.0.0
 		 */
-		$this->active_modules = apply_filters( 'rtcamp.oauth_login_modules', $this->active_modules );
+		$this->active_modules = apply_filters( 'daxhurley.oauth_login_modules', $this->active_modules );
 
 		$this->container()->define_services();
 		$this->activate_modules();

@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Tests;
+namespace DaxHurley\OAuthLogin\Tests;
 
 use WP_Mock\Tools\TestCase as WPMockTestCase;
 use ReflectionException;

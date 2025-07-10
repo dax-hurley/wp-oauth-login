@@ -34,7 +34,7 @@ msgstr ""
 
 #. Author URI of the plugin
 #: login-with-oauth.php
-msgid "https://rtcamp.com"
+msgid "https://daxhurley.com"
 msgstr ""
 
 #: login-with-oauth.php:40

@@ -5,25 +5,25 @@
  * This will authenticate the user. Also responsible for registration
  * in case it is enabled in the settings.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.1.1
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Utils;
+namespace DaxHurley\OAuthLogin\Utils;
 
 use WP_User;
 use stdClass;
 use Exception;
 use Throwable;
 use InvalidArgumentException;
-use RtCamp\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Modules\Settings;
 
 /**
  * Class Authenticator
  *
- * @package RtCamp\OAuthLogin\Utils
+ * @package DaxHurley\OAuthLogin\Utils
  */
 class Authenticator {
 	/**
@@ -69,7 +69,7 @@ class Authenticator {
 			 * @param WP_User $user_wp WP User data object.
 			 * @param stdClass $user User data object returned by OAuth.
 			 */
-			do_action( 'rtcamp.oauth_user_logged_in', $user_wp, $user );
+			do_action( 'daxhurley.oauth_user_logged_in', $user_wp, $user );
 
 			return $user_wp;
 		}
@@ -80,7 +80,7 @@ class Authenticator {
 		 * @param stdClass $user User object from oauth.
 		 * @since 1.0.0
 		 */
-		return apply_filters( 'rtcamp.oauth_register_user', $this->maybe_create_username( $user ) );
+		return apply_filters( 'daxhurley.oauth_register_user', $this->maybe_create_username( $user ) );
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Authenticator {
 				/**
 				 * Fires once the user has been registered successfully.
 				 */
-				do_action( 'rtcamp.oauth_user_created', $uid, $user );
+				do_action( 'daxhurley.oauth_user_created', $uid, $user );
 
 				return get_user_by( 'id', $uid );
 			}

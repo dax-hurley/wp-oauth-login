@@ -5,11 +5,11 @@
  * Every module inside src/Modules/ should implement
  * to this interface.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
-namespace RtCamp\OAuthLogin\Interfaces;
+namespace DaxHurley\OAuthLogin\Interfaces;
 
 /**
  * Interface Module

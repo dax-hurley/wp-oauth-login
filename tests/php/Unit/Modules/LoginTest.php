@@ -5,27 +5,27 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Modules;
 
 use Exception;
-use RtCamp\OAuthLogin\Container;
-use RtCamp\OAuthLogin\Plugin;
+use DaxHurley\OAuthLogin\Container;
+use DaxHurley\OAuthLogin\Plugin;
 use WP_Mock;
 use Mockery;
-use RtCamp\OAuthLogin\Utils\Helper;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Modules\Settings;
-use RtCamp\OAuthLogin\Modules\Login as Testee;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\OAuthLogin\Utils\Authenticator;
+use DaxHurley\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Modules\Login as Testee;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Utils\Authenticator;
 
 /**
  * Class LoginTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Login
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Modules\Login
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Modules
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Modules
  */
 class LoginTest extends TestCase {
 	/**
@@ -75,10 +75,10 @@ class LoginTest extends TestCase {
 	public function testInit() {
 		WP_Mock::expectActionAdded( 'login_form', [ $this->testee, 'login_button' ] );
 		WP_Mock::expectActionAdded( 'authenticate', [ $this->testee, 'authenticate' ], 20 );
-		WP_Mock::expectActionAdded( 'rtcamp.oauth_register_user', [ $this->authenticatorMock, 'register' ] );
-		WP_Mock::expectActionAdded( 'rtcamp.oauth_redirect_url', [ $this->testee, 'redirect_url' ] );
-		WP_Mock::expectActionAdded( 'rtcamp.oauth_user_created', [ $this->testee, 'user_meta' ] );
-		WP_Mock::expectFilterAdded( 'rtcamp.oauth_login_state', [ $this->testee, 'state_redirect' ] );
+		WP_Mock::expectActionAdded( 'daxhurley.oauth_register_user', [ $this->authenticatorMock, 'register' ] );
+		WP_Mock::expectActionAdded( 'daxhurley.oauth_redirect_url', [ $this->testee, 'redirect_url' ] );
+		WP_Mock::expectActionAdded( 'daxhurley.oauth_user_created', [ $this->testee, 'user_meta' ] );
+		WP_Mock::expectFilterAdded( 'daxhurley.oauth_login_state', [ $this->testee, 'state_redirect' ] );
 		WP_Mock::expectActionAdded( 'wp_login', [ $this->testee, 'login_redirect' ] );
 
 		$this->testee->init();
@@ -106,7 +106,7 @@ class LoginTest extends TestCase {
 		                   ->willReturn( 'https://oauth.com/auth/' );
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			2,
 			$pluginMock
@@ -442,7 +442,7 @@ class LoginTest extends TestCase {
 			'https://example.com/login'
 		);
 
-		WP_Mock::expectFilter( 'rtcamp.oauth_default_redirect', 'https://example.com/login' );
+		WP_Mock::expectFilter( 'daxhurley.oauth_default_redirect', 'https://example.com/login' );
 		$state_data = $this->testee->state_redirect( [] );
 		$this->assertIsArray( $state_data );
 		$this->assertContains( 'https://example.com/login', $state_data );

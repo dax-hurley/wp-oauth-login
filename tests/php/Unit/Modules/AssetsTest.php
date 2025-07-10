@@ -5,18 +5,18 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Modules;
 
 use WP_Mock;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Modules\Assets as Testee;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Modules\Assets as Testee;
 
 /**
  * Class AssetsTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Assets
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Modules\Assets
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Modules
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Modules
  */
 class AssetsTest extends TestCase {
 	/**
@@ -61,7 +61,7 @@ class AssetsTest extends TestCase {
 	 */
 	public function testRegisterLoginStyles() {
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			2,
 			function () {
@@ -94,7 +94,7 @@ class AssetsTest extends TestCase {
 	 */
 	public function testRegisterLoginScript() {
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			2,
 			function () {
@@ -220,7 +220,7 @@ class AssetsTest extends TestCase {
 		);
 
 		$this->wpMockFunction(
-			'RtCamp\OAuthLogin\plugin',
+			'DaxHurley\OAuthLogin\plugin',
 			[],
 			4,
 			function () {

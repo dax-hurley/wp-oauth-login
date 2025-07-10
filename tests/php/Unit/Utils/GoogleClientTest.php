@@ -5,19 +5,19 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit\Utils;
+namespace DaxHurley\OAuthLogin\Tests\Unit\Utils;
 
 use WP_Mock;
 use Exception;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Utils\OAuthClient as Testee;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Utils\OAuthClient as Testee;
 
 /**
  * Class OAuthClientTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Utils\OAuthClient
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Utils\OAuthClient
  *
- * @package RtCamp\OAuthLogin\Tests\Unit\Utils
+ * @package DaxHurley\OAuthLogin\Tests\Unit\Utils
  */
 class OAuthClientTest extends TestCase {
 
@@ -68,7 +68,7 @@ class OAuthClientTest extends TestCase {
 	 * @covers ::gt_redirect_url
 	 */
 	public function testCallWithOtherMethods() {
-		WP_Mock::expectFilterNotAdded( 'rtcamp.github_redirect_url', '' );
+		WP_Mock::expectFilterNotAdded( 'daxhurley.github_redirect_url', '' );
 		$this->testee->__call( 'some_other_method', null );
 
 		$this->assertConditionsMet();
@@ -81,7 +81,7 @@ class OAuthClientTest extends TestCase {
 	 * @covers ::access_token
 	 */
 	public function testSetAccessToken() {
-		WP_Mock::expectFilter( 'rtcamp.oauth_redirect_url', '' );
+		WP_Mock::expectFilter( 'daxhurley.oauth_redirect_url', '' );
 
 		$this->wpMockFunction(
 			'wp_remote_post',
@@ -139,7 +139,7 @@ class OAuthClientTest extends TestCase {
 	 * @covers ::set_access_token
 	 */
 	public function testSetAccessTokenThrowsException() {
-		WP_Mock::expectFilter( 'rtcamp.oauth_redirect_url', '' );
+		WP_Mock::expectFilter( 'daxhurley.oauth_redirect_url', '' );
 
 		$this->wpMockFunction(
 			'wp_remote_post',
@@ -326,7 +326,7 @@ class OAuthClientTest extends TestCase {
 	 */
 	public function testAuthorizationURL() {
 		$scope = [ 'email', 'profile', 'openid' ];
-		WP_Mock::onFilter( 'rtcamp.oauth_scope' )->with( $scope )->reply( $scope );
+		WP_Mock::onFilter( 'daxhurley.oauth_scope' )->with( $scope )->reply( $scope );
 		$ghClient = $this->createPartialMock( Testee::class, [ 'gt_redirect_url', 'state' ] );
 		$ghClient->expects( $this->once() )->method( 'gt_redirect_url' )->willReturn( '' );
 		$ghClient->expects( $this->once() )->method( 'state' )->willReturn( 'abcd' );
@@ -341,7 +341,7 @@ class OAuthClientTest extends TestCase {
 			'response_type' => 'code',
 		];
 
-		WP_Mock::expectFilter( 'rtcamp.oauth_client_args', $client_args );
+		WP_Mock::expectFilter( 'daxhurley.oauth_client_args', $client_args );
 
 		$expected = 'https://accounts.oauth.com/o/oauth2/auth?client_id=cid&redirect_uri=&state=abcd&scope=email+profile+openid&access_type=online&response_type=code';
 

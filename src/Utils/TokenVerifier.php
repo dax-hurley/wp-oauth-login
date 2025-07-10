@@ -4,23 +4,23 @@
  *
  * This will verify the token based on asymmetric encryption.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.16
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Utils;
+namespace DaxHurley\OAuthLogin\Utils;
 
 use Requests_Utility_CaseInsensitiveDictionary;
 use Exception;
-use RtCamp\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Modules\Settings;
 use stdClass;
 
 /**
  * Class TokenVerifier
  *
- * @package RtCamp\OAuthLogin\Utils
+ * @package DaxHurley\OAuthLogin\Utils
  */
 class TokenVerifier {
 	/**
@@ -78,7 +78,7 @@ class TokenVerifier {
 		$find_algo = array_key_exists( $algo, self::SUPPORTED_ALGORITHMS );
 
 		if ( ! $find_algo ) {
-			return apply_filters( 'rtcamp.default_algorithm', OPENSSL_ALGO_SHA256, $algo );
+			return apply_filters( 'daxhurley.default_algorithm', OPENSSL_ALGO_SHA256, $algo );
 		}
 
 		return self::SUPPORTED_ALGORITHMS[ $algo ];
@@ -103,7 +103,7 @@ class TokenVerifier {
 			return true;
 		} catch ( Exception $e ) {
 
-			do_action( 'rtcamp.login_with_oauth_exception', $e );
+			do_action( 'daxhurley.login_with_oauth_exception', $e );
 
 			throw $e;
 		}

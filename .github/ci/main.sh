@@ -23,7 +23,7 @@ function start_services() {
 }
 
 
-# Create, setup and populate learn.rtcamp.com base site with data
+# Create, setup and populate learn.daxhurley.com base site with data
 function create_and_configure_site () {
 
     ee site create $SITE_NAME --wp --php74 

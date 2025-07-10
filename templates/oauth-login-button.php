@@ -2,11 +2,11 @@
 /**
  * Template for oauth login button.
  *
- * @package RtCamp\GithubLogin
+ * @package DaxHurley\GithubLogin
  * @since 1.0.0
  */
 
-use RtCamp\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Utils\Helper;
 
 if ( isset( $custom_btn_text ) && $custom_btn_text ) {
 	$button_text = esc_html( $custom_btn_text );

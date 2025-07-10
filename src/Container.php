@@ -7,31 +7,31 @@
  * useful for defining services and serves as service
  * locator.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin;
+namespace DaxHurley\OAuthLogin;
 
-use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
+use DaxHurley\OAuthLogin\Interfaces\Container as ContainerInterface;
 use Pimple\Container as PimpleContainer;
 use InvalidArgumentException;
-use RtCamp\OAuthLogin\Modules\Assets;
-use RtCamp\OAuthLogin\Modules\Block;
-use RtCamp\OAuthLogin\Modules\Login;
-use RtCamp\OAuthLogin\Modules\OneTapLogin;
-use RtCamp\OAuthLogin\Modules\Settings;
-use RtCamp\OAuthLogin\Utils\Authenticator;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Modules\Shortcode;
-use RtCamp\OAuthLogin\Utils\TokenVerifier;
+use DaxHurley\OAuthLogin\Modules\Assets;
+use DaxHurley\OAuthLogin\Modules\Block;
+use DaxHurley\OAuthLogin\Modules\Login;
+use DaxHurley\OAuthLogin\Modules\OneTapLogin;
+use DaxHurley\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Utils\Authenticator;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Modules\Shortcode;
+use DaxHurley\OAuthLogin\Utils\TokenVerifier;
 
 /**
  * Class Container
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 class Container implements ContainerInterface {
 	/**
@@ -197,6 +197,6 @@ class Container implements ContainerInterface {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'rtcamp.oauth_login_services', $this );
+		do_action( 'daxhurley.oauth_login_services', $this );
 	}
 }

@@ -2,23 +2,23 @@
 /**
  * Shortcode Class.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Modules;
+namespace DaxHurley\OAuthLogin\Modules;
 
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\OAuthLogin\Utils\Helper;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use function RtCamp\OAuthLogin\plugin;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class Shortcode
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  */
 class Shortcode implements ModuleInterface {
 
@@ -103,7 +103,7 @@ class Shortcode implements ModuleInterface {
 
 		$this->redirect_uri = $attrs['redirect_to'];
 
-		add_filter( 'rtcamp.oauth_redirect_url', [ $this, 'redirect_url' ] );
+		add_filter( 'daxhurley.oauth_redirect_url', [ $this, 'redirect_url' ] );
 		
 		Helper::set_redirect_state_filter( $redirect_to );
 
@@ -111,7 +111,7 @@ class Shortcode implements ModuleInterface {
 
 		Helper::remove_redirect_state_filter();
 		
-		remove_filter( 'rtcamp.oauth_redirect_url', [ $this, 'redirect_url' ] );
+		remove_filter( 'daxhurley.oauth_redirect_url', [ $this, 'redirect_url' ] );
 		$template = trailingslashit( plugin()->template_dir ) . 'oauth-login-button.php';
 
 		return Helper::render_template( $template, $attrs, false );

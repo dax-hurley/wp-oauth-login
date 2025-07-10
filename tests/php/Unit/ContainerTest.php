@@ -5,22 +5,22 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\OAuthLogin\Tests\Unit;
+namespace DaxHurley\OAuthLogin\Tests\Unit;
 
 use Mockery;
 use InvalidArgumentException;
 use Pimple\Container as PimpleContainer;
-use RtCamp\OAuthLogin\Container;
-use RtCamp\OAuthLogin\Container as Testee;
-use RtCamp\OAuthLogin\Tests\TestCase;
-use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
+use DaxHurley\OAuthLogin\Container;
+use DaxHurley\OAuthLogin\Container as Testee;
+use DaxHurley\OAuthLogin\Tests\TestCase;
+use DaxHurley\OAuthLogin\Interfaces\Container as ContainerInterface;
 
 /**
  * Class ContainerTest
  *
- * @coversDefaultClass \RtCamp\OAuthLogin\Container
+ * @coversDefaultClass \DaxHurley\OAuthLogin\Container
  *
- * @package RtCamp\OAuthLogin\Tests\Unit
+ * @package DaxHurley\OAuthLogin\Tests\Unit
  */
 class ContainerTest extends  TestCase {
 

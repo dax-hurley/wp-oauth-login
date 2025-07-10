@@ -4,13 +4,13 @@
  *
  * This class has been taken from WP OAuth Login plugin.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Utils;
+namespace DaxHurley\OAuthLogin\Utils;
 
 /**
  * Class Helper
@@ -204,7 +204,7 @@ class Helper {
 	 * Get the redirection URL and set the redirection URL to the default URL.
 	 *
 	 * This function offers customization to the users for the URL that they want to be redirected to.
-	 * The filter `rtcamp.oauth_default_redirect` can be used to manipulate the value of $default_redirect_url.
+	 * The filter `daxhurley.oauth_default_redirect` can be used to manipulate the value of $default_redirect_url.
 	 * This way the updated redirection URL customized by the user can be integrated into current system.
 	 *
 	 * @return string
@@ -232,7 +232,7 @@ class Helper {
 			}
 		}
 
-		return apply_filters( 'rtcamp.oauth_default_redirect', $default_redirect_url );
+		return apply_filters( 'daxhurley.oauth_default_redirect', $default_redirect_url );
 	}
 
 	/**
@@ -249,7 +249,7 @@ class Helper {
 
 		self::$redirection_url = $redirect_to;
 
-		add_filter( 'rtcamp.oauth_login_state', [ __CLASS__, 'update_redirect_state' ] );
+		add_filter( 'daxhurley.oauth_login_state', [ __CLASS__, 'update_redirect_state' ] );
 	}
 
 	/**
@@ -275,6 +275,6 @@ class Helper {
 	 * @return void
 	 */
 	public static function remove_redirect_state_filter() {
-		remove_filter( 'rtcamp.oauth_login_state', [ __CLASS__, 'update_redirect_state' ] );
+		remove_filter( 'daxhurley.oauth_login_state', [ __CLASS__, 'update_redirect_state' ] );
 	}
 }

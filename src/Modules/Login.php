@@ -6,29 +6,29 @@
  * oauth login button on wp-login page, authorizing the user,
  * authenticating user and redirecting him to admin.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Modules;
+namespace DaxHurley\OAuthLogin\Modules;
 
 use WP_User;
 use WP_Error;
 use stdClass;
 use Throwable;
 use Exception;
-use RtCamp\OAuthLogin\Utils\Helper;
-use RtCamp\OAuthLogin\Utils\OAuthClient;
-use RtCamp\OAuthLogin\Utils\Authenticator;
-use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
-use function RtCamp\OAuthLogin\plugin;
+use DaxHurley\OAuthLogin\Utils\Helper;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Utils\Authenticator;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class Login.
  *
- * @package RtCamp\OAuthLogin\Modules
+ * @package DaxHurley\OAuthLogin\Modules
  */
 class Login implements ModuleInterface {
 	/**
@@ -82,10 +82,10 @@ class Login implements ModuleInterface {
 		add_action( 'login_form', [ $this, 'login_button' ] );
 		// Priority is 20 because of issue: https://core.trac.wordpress.org/ticket/46748.
 		add_action( 'authenticate', [ $this, 'authenticate' ], 20 );
-		add_action( 'rtcamp.oauth_register_user', [ $this->authenticator, 'register' ] );
-		add_action( 'rtcamp.oauth_redirect_url', [ $this, 'redirect_url' ] );
-		add_action( 'rtcamp.oauth_user_created', [ $this, 'user_meta' ] );
-		add_filter( 'rtcamp.oauth_login_state', [ $this, 'state_redirect' ] );
+		add_action( 'daxhurley.oauth_register_user', [ $this->authenticator, 'register' ] );
+		add_action( 'daxhurley.oauth_redirect_url', [ $this, 'redirect_url' ] );
+		add_action( 'daxhurley.oauth_user_created', [ $this, 'user_meta' ] );
+		add_filter( 'daxhurley.oauth_login_state', [ $this, 'state_redirect' ] );
 		add_action( 'wp_login', [ $this, 'login_redirect' ] );
 	}
 
@@ -151,7 +151,7 @@ class Login implements ModuleInterface {
 				 *
 				 * @param WP_User $user WP User object.
 				 */
-				do_action( 'rtcamp.oauth_user_authenticated', $user );
+				do_action( 'daxhurley.oauth_user_authenticated', $user );
 
 				return $user;
 			}
@@ -205,7 +205,7 @@ class Login implements ModuleInterface {
 		 *
 		 * @param string $admin_url Admin URL address.
 		 */
-		$state['redirect_to'] = $redirect_to ?? apply_filters( 'rtcamp.oauth_default_redirect', admin_url() );
+		$state['redirect_to'] = $redirect_to ?? apply_filters( 'daxhurley.oauth_default_redirect', admin_url() );
 
 		return $state;
 	}

@@ -4,20 +4,20 @@
  *
  * Useful for authenticating the user and other API related operations.
  *
- * @package RtCamp\OAuthLogin
+ * @package DaxHurley\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\OAuthLogin\Utils;
+namespace DaxHurley\OAuthLogin\Utils;
 
 use Exception;
 
 /**
  * Class OAuthClient
  *
- * @package RtCamp\OAuthLogin\Utils
+ * @package DaxHurley\OAuthLogin\Utils
  */
 class OAuthClient {
 	/**
@@ -123,7 +123,7 @@ class OAuthClient {
 	 * @return string
 	 */
 	public function gt_redirect_url(): string {
-		return apply_filters( 'rtcamp.oauth_redirect_url', $this->redirect_uri );
+		return apply_filters( 'daxhurley.oauth_redirect_url', $this->redirect_uri );
 	}
 
 	/**
@@ -144,7 +144,7 @@ class OAuthClient {
 				$plugin_scope,
 			],
 			'1.0.15',
-			'rtcamp.oauth_scope'
+			'daxhurley.oauth_scope'
 		);
 
 		/**
@@ -152,7 +152,7 @@ class OAuthClient {
 		 *
 		 * @param array $scope List of scopes.
 		 */
-		$scope = apply_filters( 'rtcamp.oauth_scope', $scope );
+		$scope = apply_filters( 'daxhurley.oauth_scope', $scope );
 
 		$client_args = [
 			'client_id'     => $this->client_id,
@@ -170,7 +170,7 @@ class OAuthClient {
 		 *
 		 * @param array $client_args List of query arguments to send to OAuth OAuth.
 		 */
-		$client_args = apply_filters( 'rtcamp.oauth_client_args', $client_args );
+		$client_args = apply_filters( 'daxhurley.oauth_client_args', $client_args );
 
 		return self::AUTHORIZE_URL . '?' . http_build_query( $client_args );
 	}
@@ -245,7 +245,7 @@ class OAuthClient {
 	 */
 	public function state(): string {
 		$state_data['nonce']    = wp_create_nonce( 'login_with_oauth' );
-		$state_data             = apply_filters( 'rtcamp.oauth_login_state', $state_data );
+		$state_data             = apply_filters( 'daxhurley.oauth_login_state', $state_data );
 		$state_data['provider'] = 'oauth';
 
 		return base64_encode( wp_json_encode( $state_data ) );
