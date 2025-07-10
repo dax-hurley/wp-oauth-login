@@ -5,31 +5,31 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Modules;
+namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
 
 use Exception;
-use RtCamp\GoogleLogin\Container;
-use RtCamp\GoogleLogin\Plugin;
+use RtCamp\OAuthLogin\Container;
+use RtCamp\OAuthLogin\Plugin;
 use WP_Mock;
 use Mockery;
-use RtCamp\GoogleLogin\Utils\Helper;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use RtCamp\GoogleLogin\Modules\Settings;
-use RtCamp\GoogleLogin\Modules\Login as Testee;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\GoogleLogin\Utils\Authenticator;
+use RtCamp\OAuthLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use RtCamp\OAuthLogin\Modules\Settings;
+use RtCamp\OAuthLogin\Modules\Login as Testee;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Utils\Authenticator;
 
 /**
  * Class LoginTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Modules\Login
+ * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Login
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Modules
+ * @package RtCamp\OAuthLogin\Tests\Unit\Modules
  */
 class LoginTest extends TestCase {
 	/**
-	 * @var GoogleClient
+	 * @var OAuthClient
 	 */
 	private $ghClientMock;
 
@@ -49,7 +49,7 @@ class LoginTest extends TestCase {
 	 * @return void
 	 */
 	public function setUp(): void {
-		$this->ghClientMock      = $this->createMock( GoogleClient::class );
+		$this->ghClientMock      = $this->createMock( OAuthClient::class );
 		$this->authenticatorMock = $this->createMock( Authenticator::class );
 
 		$this->testee = new Testee( $this->ghClientMock, $this->authenticatorMock );
@@ -75,10 +75,10 @@ class LoginTest extends TestCase {
 	public function testInit() {
 		WP_Mock::expectActionAdded( 'login_form', [ $this->testee, 'login_button' ] );
 		WP_Mock::expectActionAdded( 'authenticate', [ $this->testee, 'authenticate' ], 20 );
-		WP_Mock::expectActionAdded( 'rtcamp.google_register_user', [ $this->authenticatorMock, 'register' ] );
-		WP_Mock::expectActionAdded( 'rtcamp.google_redirect_url', [ $this->testee, 'redirect_url' ] );
-		WP_Mock::expectActionAdded( 'rtcamp.google_user_created', [ $this->testee, 'user_meta' ] );
-		WP_Mock::expectFilterAdded( 'rtcamp.google_login_state', [ $this->testee, 'state_redirect' ] );
+		WP_Mock::expectActionAdded( 'rtcamp.oauth_register_user', [ $this->authenticatorMock, 'register' ] );
+		WP_Mock::expectActionAdded( 'rtcamp.oauth_redirect_url', [ $this->testee, 'redirect_url' ] );
+		WP_Mock::expectActionAdded( 'rtcamp.oauth_user_created', [ $this->testee, 'user_meta' ] );
+		WP_Mock::expectFilterAdded( 'rtcamp.oauth_login_state', [ $this->testee, 'state_redirect' ] );
 		WP_Mock::expectActionAdded( 'wp_login', [ $this->testee, 'login_redirect' ] );
 
 		$this->testee->init();
@@ -103,10 +103,10 @@ class LoginTest extends TestCase {
 
 		$this->ghClientMock->expects( $this->once() )
 		                   ->method( 'authorization_url' )
-		                   ->willReturn( 'https://google.com/auth/' );
+		                   ->willReturn( 'https://oauth.com/auth/' );
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			2,
 			$pluginMock
@@ -126,9 +126,9 @@ class LoginTest extends TestCase {
 		$helperMock = Mockery::mock( 'alias:' . Helper::class );
 		$helperMock->expects( 'render_template' )->once()->withArgs(
 			[
-				'https://example.com/templates/google-login-button.php',
+				'https://example.com/templates/oauth-login-button.php',
 				[
-					'login_url' => 'https://google.com/auth/',
+					'login_url' => 'https://oauth.com/auth/',
 				]
 			]
 		);
@@ -271,7 +271,7 @@ class LoginTest extends TestCase {
 			'wp_verify_nonce',
 			[
 				'testnonce',
-				'login_with_google',
+				'login_with_oauth',
 			],
 			1,
 			true
@@ -330,7 +330,7 @@ class LoginTest extends TestCase {
 			'wp_verify_nonce',
 			[
 				'testnonce',
-				'login_with_google',
+				'login_with_oauth',
 			],
 			1,
 			true
@@ -372,7 +372,7 @@ class LoginTest extends TestCase {
 			[
 				20,
 				'oauth_provider',
-				'google',
+				'oauth',
 				true,
 			],
 			1,
@@ -442,7 +442,7 @@ class LoginTest extends TestCase {
 			'https://example.com/login'
 		);
 
-		WP_Mock::expectFilter( 'rtcamp.google_default_redirect', 'https://example.com/login' );
+		WP_Mock::expectFilter( 'rtcamp.oauth_default_redirect', 'https://example.com/login' );
 		$state_data = $this->testee->state_redirect( [] );
 		$this->assertIsArray( $state_data );
 		$this->assertContains( 'https://example.com/login', $state_data );

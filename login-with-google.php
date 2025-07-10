@@ -1,23 +1,23 @@
 <?php
 /**
- * Plugin Name: Login with Google
- * Description: Allow users to login/register via Google.
+ * Plugin Name: WP OAuth Login
+ * Description: Allow users to login/register via OAuth.
  * Version: 1.4.0
  * Author: rtCamp
  * Author URI: https://rtcamp.com
- * Text Domain: login-with-google
+ * Text Domain: login-with-oauth
  * Domain Path: /languages
  * License: GPLv2+
  * Requires at least: 5.5
  * Requires PHP: 7.4
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin;
+namespace RtCamp\OAuthLogin;
 
 use Pimple\Container as PimpleContainer;
 
@@ -38,15 +38,15 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 			$hook,
 			function () {
 				$message = __(
-					'Login with google Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version',
-					'login-with-google'
+					'Login with oauth Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version',
+					'login-with-oauth'
 				);
 
 				printf(
 					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
 					esc_html__(
-						'The plugin Login with google has been deactivated',
-						'login-with-google'
+						'The plugin Login with oauth has been deactivated',
+						'login-with-oauth'
 					),
 					wp_kses( $message, [ 'br' => true ] )
 				);
@@ -117,7 +117,7 @@ function plugin(): Plugin {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here.
 	if ( isset( $_GET['reauth'] ) && null !== sanitize_text_field( wp_unslash( $_GET['reauth'] ) ) ) {
 		if ( ! empty( $_COOKIE[ LOGGED_IN_COOKIE ] ) ) {
-			wp_safe_redirect( wp_login_url(), 302, 'Login with Google' );
+			wp_safe_redirect( wp_login_url(), 302, 'WP OAuth Login' );
 			exit;
 		}
 	}

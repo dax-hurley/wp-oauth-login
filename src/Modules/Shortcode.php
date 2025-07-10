@@ -2,23 +2,23 @@
 /**
  * Shortcode Class.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Modules;
+namespace RtCamp\OAuthLogin\Modules;
 
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\GoogleLogin\Utils\Helper;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use function RtCamp\GoogleLogin\plugin;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use function RtCamp\OAuthLogin\plugin;
 
 /**
  * Class Shortcode
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 class Shortcode implements ModuleInterface {
 
@@ -27,7 +27,7 @@ class Shortcode implements ModuleInterface {
 	 *
 	 * @var string
 	 */
-	const TAG = 'google_login';
+	const TAG = 'oauth_login';
 
 	/**
 	 * Redirect URL.
@@ -37,9 +37,9 @@ class Shortcode implements ModuleInterface {
 	public $redirect_uri;
 
 	/**
-	 * Google client instance.
+	 * OAuth client instance.
 	 *
-	 * @var GoogleClient
+	 * @var OAuthClient
 	 */
 	private $gh_client;
 
@@ -53,10 +53,10 @@ class Shortcode implements ModuleInterface {
 	/**
 	 * Shortcode constructor.
 	 *
-	 * @param GoogleClient $client GH Client object.
+	 * @param OAuthClient $client GH Client object.
 	 * @param Assets       $assets Assets object.
 	 */
-	public function __construct( GoogleClient $client, Assets $assets ) {
+	public function __construct( OAuthClient $client, Assets $assets ) {
 		$this->gh_client = $client;
 		$this->assets    = $assets;
 	}
@@ -89,7 +89,7 @@ class Shortcode implements ModuleInterface {
 		$redirect_to = Helper::get_redirect_url();
 		$attrs       = shortcode_atts(
 			[
-				'button_text'   => __( 'Login with google', 'login-with-google' ),
+				'button_text'   => __( 'Login with oauth', 'login-with-oauth' ),
 				'force_display' => 'no',
 				'redirect_to'   => $redirect_to,
 			],
@@ -103,7 +103,7 @@ class Shortcode implements ModuleInterface {
 
 		$this->redirect_uri = $attrs['redirect_to'];
 
-		add_filter( 'rtcamp.google_redirect_url', [ $this, 'redirect_url' ] );
+		add_filter( 'rtcamp.oauth_redirect_url', [ $this, 'redirect_url' ] );
 		
 		Helper::set_redirect_state_filter( $redirect_to );
 
@@ -111,8 +111,8 @@ class Shortcode implements ModuleInterface {
 
 		Helper::remove_redirect_state_filter();
 		
-		remove_filter( 'rtcamp.google_redirect_url', [ $this, 'redirect_url' ] );
-		$template = trailingslashit( plugin()->template_dir ) . 'google-login-button.php';
+		remove_filter( 'rtcamp.oauth_redirect_url', [ $this, 'redirect_url' ] );
+		$template = trailingslashit( plugin()->template_dir ) . 'oauth-login-button.php';
 
 		return Helper::render_template( $template, $attrs, false );
 	}

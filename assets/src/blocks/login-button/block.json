@@ -1,12 +1,12 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "google-login/login-button",
+	"name": "oauth-login/login-button",
 	"version": "0.1.0",
-	"title": "Log in with Google",
+	"title": "Log in with OAuth",
 	"category": "widgets",
 	"icon": "admin-users",
-	"description": "Login with Google button block.",
+	"description": "WP OAuth Login button block.",
 	"example": {},
 	"supports": {
 		"html": false
@@ -20,7 +20,7 @@
 			"default": false
 		}
 	},
-	"textdomain": "login-with-google",
+	"textdomain": "login-with-oauth",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css"

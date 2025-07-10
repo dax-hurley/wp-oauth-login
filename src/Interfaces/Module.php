@@ -5,11 +5,11 @@
  * Every module inside src/Modules/ should implement
  * to this interface.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
-namespace RtCamp\GoogleLogin\Interfaces;
+namespace RtCamp\OAuthLogin\Interfaces;
 
 /**
  * Interface Module

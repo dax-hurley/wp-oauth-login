@@ -4,20 +4,20 @@
  *
  * Setup and bootstrap everything from here.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin;
+namespace RtCamp\OAuthLogin;
 
-use RtCamp\GoogleLogin\Interfaces\Container as ContainerInterface;
+use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
 
 /**
  * Class Plugin.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 class Plugin {
 
@@ -74,7 +74,7 @@ class Plugin {
 		'assets',
 		'shortcode',
 		'one_tap_login',
-		'google_login_block',
+		'oauth_login_block',
 	];
 
 	/**
@@ -93,7 +93,7 @@ class Plugin {
 	 */
 	public function run(): void {
 		$this->path         = dirname( __DIR__ );
-		$this->url          = plugin_dir_url( trailingslashit( dirname( __DIR__ ) ) . 'login-with-google.php' );
+		$this->url          = plugin_dir_url( trailingslashit( dirname( __DIR__ ) ) . 'login-with-oauth.php' );
 		$this->template_dir = trailingslashit( $this->path ) . 'templates/';
 		$this->assets_dir   = trailingslashit( $this->path ) . 'assets/';
 
@@ -104,14 +104,14 @@ class Plugin {
 		 *
 		 * @since 1.0.0
 		 */
-		$this->active_modules = apply_filters( 'rtcamp.google_login_modules', $this->active_modules );
+		$this->active_modules = apply_filters( 'rtcamp.oauth_login_modules', $this->active_modules );
 
 		$this->container()->define_services();
 		$this->activate_modules();
 
 		add_action( 'init', [ $this, 'load_translations' ] );
 
-		add_action( 'plugin_action_links_' . plugin_basename( $this->path ) . '/login-with-google.php', [ $this, 'add_plugin_action_links' ] );
+		add_action( 'plugin_action_links_' . plugin_basename( $this->path ) . '/login-with-oauth.php', [ $this, 'add_plugin_action_links' ] );
 	}
 
 	/**
@@ -120,7 +120,7 @@ class Plugin {
 	 * @return void
 	 */
 	public function load_translations(): void {
-		load_plugin_textdomain( 'login-with-google', false, basename( plugin()->path ) . '/languages/' . get_locale() );
+		load_plugin_textdomain( 'login-with-oauth', false, basename( plugin()->path ) . '/languages/' . get_locale() );
 	}
 
 	/**
@@ -156,8 +156,8 @@ class Plugin {
 		$new_actions['settings'] = sprintf(
 			/* translators: %1$s: Setting name, %2$s: URL for settings page link. */
 			'<a href="%1$s">%2$s</a>',
-			esc_url( admin_url( 'options-general.php?page=login-with-google' ) ),
-			esc_html__( 'Settings', 'login-with-google' )
+			esc_url( admin_url( 'options-general.php?page=login-with-oauth' ) ),
+			esc_html__( 'Settings', 'login-with-oauth' )
 		);
 
 		return array_merge( $new_actions, $actions );

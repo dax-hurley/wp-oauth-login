@@ -5,27 +5,27 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Modules;
+namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
 
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\GoogleLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Utils\Helper;
 use WP_Mock;
 use Mockery;
-use RtCamp\GoogleLogin\Modules\Block as Testee;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use RtCamp\GoogleLogin\Modules\Assets;
+use RtCamp\OAuthLogin\Modules\Block as Testee;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use RtCamp\OAuthLogin\Modules\Assets;
 
 /**
  * Class BlockTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Modules\Block
+ * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Block
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Modules
+ * @package RtCamp\OAuthLogin\Tests\Unit\Modules
  */
 class BlockTest extends TestCase {
 	/**
-	 * @var GoogleClient
+	 * @var OAuthClient
 	 */
 	private $ghClientMock;
 
@@ -45,7 +45,7 @@ class BlockTest extends TestCase {
 	 * @return void
 	 */
 	public function setUp(): void {
-		$this->ghClientMock = $this->createMock( GoogleClient::class );
+		$this->ghClientMock = $this->createMock( OAuthClient::class );
 		$this->assetMock       = $this->createMock( Assets::class );
 		$this->testee           = new Testee( $this->assetMock, $this->ghClientMock );
 	}
@@ -61,7 +61,7 @@ class BlockTest extends TestCase {
 	 * @covers ::name
 	 */
 	public function testName() {
-		$this->assertSame( 'google_login_block', $this->testee->name() );
+		$this->assertSame( 'oauth_login_block', $this->testee->name() );
 	}
 
 	public function testImplementsModuleInterface() {
@@ -96,7 +96,7 @@ class BlockTest extends TestCase {
 		);
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			1,
 			function () use ( $path ) {
@@ -109,7 +109,7 @@ class BlockTest extends TestCase {
 
 		$this->wpMockFunction(
 			'wp_enqueue_script',
-			[ 'google-login-block' ],
+			[ 'oauth-login-block' ],
 			1,
 			true
 		);
@@ -117,7 +117,7 @@ class BlockTest extends TestCase {
 		$this->assetMock->expects( $this->once() )->method( 'register_login_styles' );
 		$this->assetMock->expects( $this->once() )->method( 'register_script' )
 		                 ->with(
-			                 'google-login-block',
+			                 'oauth-login-block',
 			                 'build/js/block-button.js',
 			                 [
 				                 'wp-blocks',
@@ -139,10 +139,10 @@ class BlockTest extends TestCase {
 		$this->wpMockFunction(
 			'register_block_type',
 			[
-				'google-login/login-button',
+				'oauth-login/login-button',
 				[
-					'editor_style'    => 'login-with-google',
-					'style'           => 'login-with-google',
+					'editor_style'    => 'login-with-oauth',
+					'style'           => 'login-with-oauth',
 					'render_callback' => [ $this->testee, 'render_login_button' ],
 					'attributes'      => [
 						'buttonText'   => [
@@ -199,7 +199,7 @@ class BlockTest extends TestCase {
 		$path = dirname( __DIR__, 4 ) . '/templates/';
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			1,
 			function () use ( $path ) {
@@ -222,7 +222,7 @@ class BlockTest extends TestCase {
 		$helperMock = \Mockery::mock( 'alias:' . Helper::class );
 		$helperMock->expects( 'render_template' )->once()->withArgs(
 			[
-				$path . 'google-login-button.php',
+				$path . 'oauth-login-button.php',
 				$mockAttributes,
 				false,
 			]
@@ -230,7 +230,7 @@ class BlockTest extends TestCase {
 
 		$markup = $this->testee->render_login_button(
 			[
-				$path . '/google-login-button.php',
+				$path . '/oauth-login-button.php',
 				$mockAttributes,
 				false,
 			]
@@ -273,7 +273,7 @@ class BlockTest extends TestCase {
 		$path = dirname( __DIR__, 4 ) . '/templates/';
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			1,
 			function () use ( $path ) {
@@ -296,7 +296,7 @@ class BlockTest extends TestCase {
 		$helperMock = \Mockery::mock( 'alias:' . Helper::class );
 		$helperMock->expects( 'render_template' )->once()->withArgs(
 			[
-				$path . 'google-login-button.php',
+				$path . 'oauth-login-button.php',
 				$mockAttributes,
 				false,
 			]
@@ -304,7 +304,7 @@ class BlockTest extends TestCase {
 
 		$markup = $this->testee->render_login_button(
 			[
-				$path . '/google-login-button.php',
+				$path . '/oauth-login-button.php',
 				$mockAttributes,
 				false,
 			]

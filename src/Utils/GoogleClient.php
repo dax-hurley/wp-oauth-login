@@ -1,45 +1,45 @@
 <?php
 /**
- * Google API Client.
+ * OAuth API Client.
  *
  * Useful for authenticating the user and other API related operations.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Utils;
+namespace RtCamp\OAuthLogin\Utils;
 
 use Exception;
 
 /**
- * Class GoogleClient
+ * Class OAuthClient
  *
- * @package RtCamp\GoogleLogin\Utils
+ * @package RtCamp\OAuthLogin\Utils
  */
-class GoogleClient {
+class OAuthClient {
 	/**
 	 * Authorization URL.
 	 *
 	 * @var string
 	 */
-	const AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth';
+	const AUTHORIZE_URL = 'https://accounts.oauth.com/o/oauth2/auth';
 
 	/**
 	 * Access Token URL.
 	 *
 	 * @var string
 	 */
-	const TOKEN_URL = 'https://oauth2.googleapis.com/token';
+	const TOKEN_URL = 'https://oauth2.oauthapis.com/token';
 
 	/**
-	 * API base for google.
+	 * API base for oauth.
 	 *
 	 * @var string
 	 */
-	const API_BASE = 'https://www.googleapis.com';
+	const API_BASE = 'https://www.oauthapis.com';
 
 	/**
 	 * Client ID.
@@ -70,7 +70,7 @@ class GoogleClient {
 	private $access_token;
 
 	/**
-	 * GoogleClient constructor.
+	 * OAuthClient constructor.
 	 *
 	 * @param array $config Configuration for client.
 	 */
@@ -95,7 +95,7 @@ class GoogleClient {
 		];
 
 		if ( in_array( $name, $methods, true ) && empty( $this->access_token ) ) {
-			throw new Exception( esc_html__( 'Access token must be set to make this API call', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'Access token must be set to make this API call', 'login-with-oauth' ) );
 		}
 	}
 
@@ -123,7 +123,7 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function gt_redirect_url(): string {
-		return apply_filters( 'rtcamp.google_redirect_url', $this->redirect_uri );
+		return apply_filters( 'rtcamp.oauth_redirect_url', $this->redirect_uri );
 	}
 
 	/**
@@ -139,12 +139,12 @@ class GoogleClient {
 		];
 
 		$scope = apply_filters_deprecated(
-			'wp_google_login_scopes',
+			'wp_oauth_login_scopes',
 			[
 				$plugin_scope,
 			],
 			'1.0.15',
-			'rtcamp.google_scope'
+			'rtcamp.oauth_scope'
 		);
 
 		/**
@@ -152,7 +152,7 @@ class GoogleClient {
 		 *
 		 * @param array $scope List of scopes.
 		 */
-		$scope = apply_filters( 'rtcamp.google_scope', $scope );
+		$scope = apply_filters( 'rtcamp.oauth_scope', $scope );
 
 		$client_args = [
 			'client_id'     => $this->client_id,
@@ -168,9 +168,9 @@ class GoogleClient {
 		 *
 		 * This is useful in cases for example: choosing the correct prompt.
 		 *
-		 * @param array $client_args List of query arguments to send to Google OAuth.
+		 * @param array $client_args List of query arguments to send to OAuth OAuth.
 		 */
-		$client_args = apply_filters( 'rtcamp.google_client_args', $client_args );
+		$client_args = apply_filters( 'rtcamp.oauth_client_args', $client_args );
 
 		return self::AUTHORIZE_URL . '?' . http_build_query( $client_args );
 	}
@@ -201,7 +201,7 @@ class GoogleClient {
 		);
 
 		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the access token, please try again.', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'Could not retrieve the access token, please try again.', 'login-with-oauth' ) );
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
@@ -227,7 +227,7 @@ class GoogleClient {
 			);
 
 			if ( 200 !== wp_remote_retrieve_response_code( $user ) ) {
-				throw new Exception( esc_html__( 'Could not retrieve the user information, please try again.', 'login-with-google' ) );
+				throw new Exception( esc_html__( 'Could not retrieve the user information, please try again.', 'login-with-oauth' ) );
 			}
 
 			return json_decode( wp_remote_retrieve_body( $user ) );
@@ -244,9 +244,9 @@ class GoogleClient {
 	 * @return string
 	 */
 	public function state(): string {
-		$state_data['nonce']    = wp_create_nonce( 'login_with_google' );
-		$state_data             = apply_filters( 'rtcamp.google_login_state', $state_data );
-		$state_data['provider'] = 'google';
+		$state_data['nonce']    = wp_create_nonce( 'login_with_oauth' );
+		$state_data             = apply_filters( 'rtcamp.oauth_login_state', $state_data );
+		$state_data['provider'] = 'oauth';
 
 		return base64_encode( wp_json_encode( $state_data ) );
 	}

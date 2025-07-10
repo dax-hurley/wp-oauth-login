@@ -3,7 +3,7 @@
 
 1. **Assign different user role to user created by the plugin**
 ```php
-add_action( 'rtcamp.google_user_created', function( $user_id ) {
+add_action( 'rtcamp.oauth_user_created', function( $user_id ) {
    // Get WP_User object from user_id.
    $user = get_user( $user_id );
 

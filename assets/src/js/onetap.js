@@ -1,4 +1,4 @@
-window.LoginWithGoogleDataCallBack = function( response ) {
+window.LoginWithOAuthDataCallBack = function( response ) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', TempAccessOneTap.ajaxurl, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -19,7 +19,7 @@ window.LoginWithGoogleDataCallBack = function( response ) {
                     var homeurl = new URL( TempAccessOneTap.homeurl );
 
                     if ( redirect_to.host !== homeurl.host ) {
-                        throw new URIError( wp.i18n.__( 'Invalid URL for Redirection', 'login-with-google' ) );
+                        throw new URIError( wp.i18n.__( 'Invalid URL for Redirection', 'login-with-oauth' ) );
                     }
 
                 } catch ( e ) {

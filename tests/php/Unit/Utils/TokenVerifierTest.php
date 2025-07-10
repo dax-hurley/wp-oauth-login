@@ -2,24 +2,24 @@
 /**
  * Tests for token verifier.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Utils;
+namespace RtCamp\OAuthLogin\Tests\Unit\Utils;
 
-use RtCamp\GoogleLogin\Modules\Settings;
-use RtCamp\GoogleLogin\Tests\PrivateAccess;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Utils\TokenVerifier as Testee;
+use RtCamp\OAuthLogin\Modules\Settings;
+use RtCamp\OAuthLogin\Tests\PrivateAccess;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Utils\TokenVerifier as Testee;
 
 /**
  * Class TokenVerifierTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Utils\TokenVerifier
+ * @coversDefaultClass \RtCamp\OAuthLogin\Utils\TokenVerifier
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Utils
+ * @package RtCamp\OAuthLogin\Tests\Unit\Utils
  */
 class TokenVerifierTest extends TestCase {
 
@@ -28,7 +28,7 @@ class TokenVerifierTest extends TestCase {
 	/**
 	 * Object under test.
 	 *
-	 * @var \RtCamp\GoogleLogin\Utils\TokenVerifier
+	 * @var \RtCamp\OAuthLogin\Utils\TokenVerifier
 	 */
 	private $testee;
 
@@ -53,7 +53,7 @@ class TokenVerifierTest extends TestCase {
 	}
 
 	public function testCertsURL() {
-		$this->assertSame( 'https://www.googleapis.com/oauth2/v1/certs', $this->testee::CERTS_URL );
+		$this->assertSame( 'https://www.oauthapis.com/oauth2/v1/certs', $this->testee::CERTS_URL );
 	}
 
 	/**

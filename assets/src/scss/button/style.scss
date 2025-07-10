@@ -2,7 +2,7 @@ $light_gray_color: #e1e2e2;
 $gray_color: #ccced0;
 $white_color: #FFFFFF;
 
-.wp_google_login {
+.wp_oauth_login {
 
 	margin: 40px auto 0 auto;
 	clear: both;
@@ -70,8 +70,8 @@ $white_color: #FFFFFF;
 
 	}
 
-	&__google-icon{
-		background: url("../../images/google_light.png") no-repeat center;
+	&__oauth-icon{
+		background: url("../../images/oauth_light.png") no-repeat center;
 		width: 25px;
 		height: 25px;
 		display: inline-block;

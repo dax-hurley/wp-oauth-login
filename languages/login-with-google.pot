@@ -2,8 +2,8 @@
 # This file is distributed under the GPLv2+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Login with Google 1.4.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/login-with-google\n"
+"Project-Id-Version: WP OAuth Login 1.4.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/login-with-oauth\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -12,37 +12,37 @@ msgstr ""
 "POT-Creation-Date: 2025-05-15T07:44:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0-alpha\n"
-"X-Domain: login-with-google\n"
+"X-Domain: login-with-oauth\n"
 
 #. Plugin Name of the plugin
-#: login-with-google.php
+#: login-with-oauth.php
 #: src/Modules/Settings.php:315
-#: templates/google-login-button.php:14
+#: templates/oauth-login-button.php:14
 #: assets/build/blocks/login-button/index.js:1
-msgid "Login with Google"
+msgid "WP OAuth Login"
 msgstr ""
 
 #. Description of the plugin
-#: login-with-google.php
-msgid "Allow users to login/register via Google."
+#: login-with-oauth.php
+msgid "Allow users to login/register via OAuth."
 msgstr ""
 
 #. Author of the plugin
-#: login-with-google.php
+#: login-with-oauth.php
 msgid "rtCamp"
 msgstr ""
 
 #. Author URI of the plugin
-#: login-with-google.php
+#: login-with-oauth.php
 msgid "https://rtcamp.com"
 msgstr ""
 
-#: login-with-google.php:40
-msgid "Login with google Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version"
+#: login-with-oauth.php:40
+msgid "Login with oauth Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version"
 msgstr ""
 
-#: login-with-google.php:47
-msgid "The plugin Login with google has been deactivated"
+#: login-with-oauth.php:47
+msgid "The plugin Login with oauth has been deactivated"
 msgstr ""
 
 #. translators: %$s is replaced with requested service name.
@@ -63,7 +63,7 @@ msgid "User not found to authenticate"
 msgstr ""
 
 #: src/Modules/Settings.php:97
-msgid "Log in with Google Settings"
+msgid "Log in with OAuth Settings"
 msgstr ""
 
 #: src/Modules/Settings.php:105
@@ -120,11 +120,11 @@ msgid "Add each domain comma separated"
 msgstr ""
 
 #: src/Modules/Settings.php:314
-msgid "Login with Google settings"
+msgid "WP OAuth Login settings"
 msgstr ""
 
 #: src/Modules/Shortcode.php:92
-msgid "Login with google"
+msgid "Login with oauth"
 msgstr ""
 
 #: src/Plugin.php:160
@@ -145,15 +145,15 @@ msgstr ""
 msgid "Cannot register with this email: %s"
 msgstr ""
 
-#: src/Utils/GoogleClient.php:98
+#: src/Utils/OAuthClient.php:98
 msgid "Access token must be set to make this API call"
 msgstr ""
 
-#: src/Utils/GoogleClient.php:204
+#: src/Utils/OAuthClient.php:204
 msgid "Could not retrieve the access token, please try again."
 msgstr ""
 
-#: src/Utils/GoogleClient.php:230
+#: src/Utils/OAuthClient.php:230
 msgid "Could not retrieve the user information, please try again."
 msgstr ""
 
@@ -183,7 +183,7 @@ msgstr ""
 msgid "User data is stale! Please try again."
 msgstr ""
 
-#: templates/google-login-button.php:24
+#: templates/oauth-login-button.php:24
 msgid "Log out"
 msgstr ""
 
@@ -192,7 +192,7 @@ msgid "Display Logout"
 msgstr ""
 
 #: assets/build/blocks/login-button/index.js:1
-msgid "If the user is logged in, keeping this box unchecked will remove the Login with Google button from the page. If the box is checked, the button will show with title changed to ‘Logout’"
+msgid "If the user is logged in, keeping this box unchecked will remove the WP OAuth Login button from the page. If the box is checked, the button will show with title changed to ‘Logout’"
 msgstr ""
 
 #: assets/build/js/onetap.js:22
@@ -201,10 +201,10 @@ msgstr ""
 
 #: assets/build/blocks/login-button/block.json
 msgctxt "block title"
-msgid "Log in with Google"
+msgid "Log in with OAuth"
 msgstr ""
 
 #: assets/build/blocks/login-button/block.json
 msgctxt "block description"
-msgid "Login with Google button block."
+msgid "WP OAuth Login button block."
 msgstr ""

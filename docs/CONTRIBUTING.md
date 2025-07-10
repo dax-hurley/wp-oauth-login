@@ -1,24 +1,24 @@
-# Contributing to Login with Google
+# Contributing to WP OAuth Login
 
-Thank you for your interest in contributing to the [Login with Google](https://github.com/rtCamp/login-with-google) WordPress plugin! 🎉 Your contributions help make this project better for everyone.
+Thank you for your interest in contributing to the [WP OAuth Login](https://github.com/rtCamp/login-with-oauth) WordPress plugin! 🎉 Your contributions help make this project better for everyone.
 
 ---
 
 ## 📌 Reporting a Bug 🐞
 
-Before creating a new issue, please check the [existing issues](https://github.com/rtCamp/login-with-google/issues) to see if your problem has already been reported or resolved.
+Before creating a new issue, please check the [existing issues](https://github.com/rtCamp/login-with-oauth/issues) to see if your problem has already been reported or resolved.
 
-If you still need to [log an issue](https://github.com/rtCamp/login-with-google/issues/new), please provide as much detail as possible, including clear steps to reproduce the issue.
+If you still need to [log an issue](https://github.com/rtCamp/login-with-oauth/issues/new), please provide as much detail as possible, including clear steps to reproduce the issue.
 
 ---
 
 ## 💡 Creating a Pull Request
 
-Want to contribute a new feature? Start a conversation by logging an [issue](https://github.com/rtCamp/login-with-google/issues).
+Want to contribute a new feature? Start a conversation by logging an [issue](https://github.com/rtCamp/login-with-oauth/issues).
 
 ### Steps to Contribute:
 
-1. Check the [existing issues](https://github.com/rtCamp/login-with-google/issues) to see if there's an open discussion about the feature or bug you want to work on. If not, create a new issue.
+1. Check the [existing issues](https://github.com/rtCamp/login-with-oauth/issues) to see if there's an open discussion about the feature or bug you want to work on. If not, create a new issue.
 2. Fork this repository.
 3. `git clone` your fork to your local machine.
 4. `cd` into the cloned repository.
@@ -26,7 +26,7 @@ Want to contribute a new feature? Start a conversation by logging an [issue](htt
 6. `cd ./assets` and run `nvm use && npm install` to install the required packages.
 7. Follow the [development workflow](#development-workflow) to set up your local development environment.
 8. Implement your changes and commit them to your fork.
-9. Push your changes and create a pull request against the `login-with-google:develop` branch.
+9. Push your changes and create a pull request against the `login-with-oauth:develop` branch.
 10. Once your PR is reviewed and approved, it will be merged into `develop` and scheduled for release. 🎉
 
 ---
@@ -62,7 +62,7 @@ This section outlines the Git workflow for contributing to the project. We follo
    git commit -m "Added new feature: [describe feature]"
    git push origin feature/new-feature
    ```
-4. Create a Pull Request (PR) to `login-with-google:develop` and wait for approval.
+4. Create a Pull Request (PR) to `login-with-oauth:develop` and wait for approval.
 
 ---
 
@@ -83,7 +83,7 @@ This section outlines the Git workflow for contributing to the project. We follo
    git commit -m "Fixed bug: [describe bug]"
    git push origin fix/bug-description
    ```
-4. Create a Pull Request (PR) to `login-with-google:develop` and wait for approval.
+4. Create a Pull Request (PR) to `login-with-oauth:develop` and wait for approval.
 
 ---
 

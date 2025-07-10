@@ -5,18 +5,18 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Modules;
+namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
 
 use WP_Mock;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Modules\Assets as Testee;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Modules\Assets as Testee;
 
 /**
  * Class AssetsTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Modules\Assets
+ * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Assets
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Modules
+ * @package RtCamp\OAuthLogin\Tests\Unit\Modules
  */
 class AssetsTest extends TestCase {
 	/**
@@ -61,7 +61,7 @@ class AssetsTest extends TestCase {
 	 */
 	public function testRegisterLoginStyles() {
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			2,
 			function () {
@@ -75,7 +75,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_style',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				'https://example.com/assets/build/css/login.css',
 				[],
 				false,
@@ -94,7 +94,7 @@ class AssetsTest extends TestCase {
 	 */
 	public function testRegisterLoginScript() {
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			2,
 			function () {
@@ -108,7 +108,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_script',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				'https://example.com/assets/js/login.js',
 				[
 					'some-other-script'
@@ -121,7 +121,7 @@ class AssetsTest extends TestCase {
 		);
 
 		$this->testee->register_script(
-			'login-with-google',
+			'login-with-oauth',
 			'js/login.js',
 			[
 				'some-other-script'
@@ -140,7 +140,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_style_is',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				'registered',
 			],
 			1,
@@ -150,7 +150,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_script_is',
 			[
-				'login-with-google-script',
+				'login-with-oauth-script',
 				'registered',
 			],
 			1,
@@ -160,7 +160,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_style',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				'https://example.com/assets/build/css/login.css',
 				[],
 				false,
@@ -173,7 +173,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_style',
 			[
-				'login-with-google',
+				'login-with-oauth',
 			],
 			1,
 			true
@@ -182,7 +182,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_script',
 			[
-				'login-with-google-script',
+				'login-with-oauth-script',
 			],
 			1,
 			true
@@ -202,7 +202,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_style_is',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				'registered',
 			],
 			1,
@@ -212,7 +212,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_script_is',
 			[
-				'login-with-google-script',
+				'login-with-oauth-script',
 				'registered',
 			],
 			1,
@@ -220,7 +220,7 @@ class AssetsTest extends TestCase {
 		);
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			4,
 			function () {
@@ -234,7 +234,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_style',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				'https://example.com/assets/build/css/login.css',
 				[],
 				false,
@@ -247,7 +247,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_style',
 			[
-				'login-with-google',
+				'login-with-oauth',
 			],
 			1,
 			true
@@ -256,7 +256,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_script',
 			[
-				'login-with-google-script',
+				'login-with-oauth-script',
 			],
 			1,
 			true

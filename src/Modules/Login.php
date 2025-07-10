@@ -3,38 +3,38 @@
  * Login class.
  *
  * This will manage the login flow, which includes adding the
- * google login button on wp-login page, authorizing the user,
+ * oauth login button on wp-login page, authorizing the user,
  * authenticating user and redirecting him to admin.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Modules;
+namespace RtCamp\OAuthLogin\Modules;
 
 use WP_User;
 use WP_Error;
 use stdClass;
 use Throwable;
 use Exception;
-use RtCamp\GoogleLogin\Utils\Helper;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use RtCamp\GoogleLogin\Utils\Authenticator;
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use function RtCamp\GoogleLogin\plugin;
+use RtCamp\OAuthLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use RtCamp\OAuthLogin\Utils\Authenticator;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use function RtCamp\OAuthLogin\plugin;
 
 /**
  * Class Login.
  *
- * @package RtCamp\GoogleLogin\Modules
+ * @package RtCamp\OAuthLogin\Modules
  */
 class Login implements ModuleInterface {
 	/**
-	 * Google client instance.
+	 * OAuth client instance.
 	 *
-	 * @var GoogleClient
+	 * @var OAuthClient
 	 */
 	private $gh_client;
 
@@ -56,10 +56,10 @@ class Login implements ModuleInterface {
 	/**
 	 * Login constructor.
 	 *
-	 * @param GoogleClient  $client GH Client object.
+	 * @param OAuthClient  $client GH Client object.
 	 * @param Authenticator $authenticator Settings object.
 	 */
-	public function __construct( GoogleClient $client, Authenticator $authenticator ) {
+	public function __construct( OAuthClient $client, Authenticator $authenticator ) {
 		$this->gh_client     = $client;
 		$this->authenticator = $authenticator;
 	}
@@ -82,10 +82,10 @@ class Login implements ModuleInterface {
 		add_action( 'login_form', [ $this, 'login_button' ] );
 		// Priority is 20 because of issue: https://core.trac.wordpress.org/ticket/46748.
 		add_action( 'authenticate', [ $this, 'authenticate' ], 20 );
-		add_action( 'rtcamp.google_register_user', [ $this->authenticator, 'register' ] );
-		add_action( 'rtcamp.google_redirect_url', [ $this, 'redirect_url' ] );
-		add_action( 'rtcamp.google_user_created', [ $this, 'user_meta' ] );
-		add_filter( 'rtcamp.google_login_state', [ $this, 'state_redirect' ] );
+		add_action( 'rtcamp.oauth_register_user', [ $this->authenticator, 'register' ] );
+		add_action( 'rtcamp.oauth_redirect_url', [ $this, 'redirect_url' ] );
+		add_action( 'rtcamp.oauth_user_created', [ $this, 'user_meta' ] );
+		add_filter( 'rtcamp.oauth_login_state', [ $this, 'state_redirect' ] );
 		add_action( 'wp_login', [ $this, 'login_redirect' ] );
 	}
 
@@ -95,7 +95,7 @@ class Login implements ModuleInterface {
 	 * @return void
 	 */
 	public function login_button(): void {
-		$template  = trailingslashit( plugin()->template_dir ) . 'google-login-button.php';
+		$template  = trailingslashit( plugin()->template_dir ) . 'oauth-login-button.php';
 		$login_url = plugin()->container()->get( 'gh_client' )->authorization_url();
 
 		Helper::render_template(
@@ -128,11 +128,11 @@ class Login implements ModuleInterface {
 		$state         = Helper::filter_input( INPUT_GET, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null;    // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 
-		if ( ! is_array( $decoded_state ) || empty( $decoded_state['provider'] ) || 'google' !== $decoded_state['provider'] ) {
+		if ( ! is_array( $decoded_state ) || empty( $decoded_state['provider'] ) || 'oauth' !== $decoded_state['provider'] ) {
 			return $user;
 		}
 
-		if ( empty( $decoded_state['nonce'] ) || ! wp_verify_nonce( $decoded_state['nonce'], 'login_with_google' ) ) {
+		if ( empty( $decoded_state['nonce'] ) || ! wp_verify_nonce( $decoded_state['nonce'], 'login_with_oauth' ) ) {
 			return $user;
 		}
 
@@ -145,21 +145,21 @@ class Login implements ModuleInterface {
 				$this->authenticated = true;
 
 				/**
-				 * Fires once the user has been authenticated via Google OAuth.
+				 * Fires once the user has been authenticated via OAuth OAuth.
 				 *
 				 * @since 1.3.0
 				 *
 				 * @param WP_User $user WP User object.
 				 */
-				do_action( 'rtcamp.google_user_authenticated', $user );
+				do_action( 'rtcamp.oauth_user_authenticated', $user );
 
 				return $user;
 			}
 
-			throw new Exception( __( 'Could not authenticate the user, please try again.', 'login-with-google' ) );
+			throw new Exception( __( 'Could not authenticate the user, please try again.', 'login-with-oauth' ) );
 
 		} catch ( Throwable $e ) {
-			return new WP_Error( 'google_login_failed', $e->getMessage() );
+			return new WP_Error( 'oauth_login_failed', $e->getMessage() );
 		}
 	}
 
@@ -172,7 +172,7 @@ class Login implements ModuleInterface {
 	 */
 	public function user_meta( int $uid ) {
 		add_user_meta( $uid, 'oauth_user', 1, true );
-		add_user_meta( $uid, 'oauth_provider', 'google', true );
+		add_user_meta( $uid, 'oauth_provider', 'oauth', true );
 	}
 
 	/**
@@ -205,7 +205,7 @@ class Login implements ModuleInterface {
 		 *
 		 * @param string $admin_url Admin URL address.
 		 */
-		$state['redirect_to'] = $redirect_to ?? apply_filters( 'rtcamp.google_default_redirect', admin_url() );
+		$state['redirect_to'] = $redirect_to ?? apply_filters( 'rtcamp.oauth_default_redirect', admin_url() );
 
 		return $state;
 	}
@@ -225,8 +225,8 @@ class Login implements ModuleInterface {
 		$state = base64_decode( $state );
 		$state = $state ? json_decode( $state ) : null;
 
-		if ( ( $state instanceof stdClass ) && ! empty( $state->provider ) && 'google' === $state->provider && ! empty( $state->redirect_to ) ) {
-			wp_safe_redirect( $state->redirect_to, 302, 'Login with Google' );
+		if ( ( $state instanceof stdClass ) && ! empty( $state->provider ) && 'oauth' === $state->provider && ! empty( $state->redirect_to ) ) {
+			wp_safe_redirect( $state->redirect_to, 302, 'WP OAuth Login' );
 			exit;
 		}
 	}

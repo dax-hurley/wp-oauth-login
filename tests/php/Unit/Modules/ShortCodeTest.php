@@ -5,27 +5,27 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Modules;
+namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
 
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\GoogleLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Utils\Helper;
 use WP_Mock;
 use Mockery;
-use RtCamp\GoogleLogin\Modules\Shortcode as Testee;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use RtCamp\GoogleLogin\Modules\Assets;
+use RtCamp\OAuthLogin\Modules\Shortcode as Testee;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use RtCamp\OAuthLogin\Modules\Assets;
 
 /**
  * Class ShortCodeTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Modules\Shortcode
+ * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Shortcode
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Modules
+ * @package RtCamp\OAuthLogin\Tests\Unit\Modules
  */
 class ShortCodeTest extends TestCase {
 	/**
-	 * @var GoogleClient
+	 * @var OAuthClient
 	 */
 	private $ghClientMock;
 
@@ -45,7 +45,7 @@ class ShortCodeTest extends TestCase {
 	 * @return void
 	 */
 	public function setUp(): void {
-		$this->ghClientMock = $this->createMock( GoogleClient::class );
+		$this->ghClientMock = $this->createMock( OAuthClient::class );
 		$this->assetMock    = $this->createMock( Assets::class );
 
 		$this->testee = new Testee( $this->ghClientMock, $this->assetMock );
@@ -72,7 +72,7 @@ class ShortCodeTest extends TestCase {
 		$this->wpMockFunction(
 			'add_shortcode',
 			[
-				'google_login',
+				'oauth_login',
 				[
 					$this->testee,
 					'callback',
@@ -103,12 +103,12 @@ class ShortCodeTest extends TestCase {
 			[
 				'args'       => [
 					[
-						'button_text'   => __( 'Login with google', 'login-with-google' ),
+						'button_text'   => __( 'Login with oauth', 'login-with-oauth' ),
 						'force_display' => 'no',
 						'redirect_to'   => 'https://example.com/',
 					],
 					[],
-					'google_login',
+					'oauth_login',
 				],
 				'times'      => 1,
 				'return_arg' => 0
@@ -137,12 +137,12 @@ class ShortCodeTest extends TestCase {
 			[
 				'args'       => [
 					[
-						'button_text'   => __( 'Login with google', 'login-with-google' ),
+						'button_text'   => __( 'Login with oauth', 'login-with-oauth' ),
 						'force_display' => 'no',
 						'redirect_to'   => null,
 					],
 					[],
-					'google_login',
+					'oauth_login',
 				],
 				'times'      => 1,
 				'return_arg' => 0
@@ -156,10 +156,10 @@ class ShortCodeTest extends TestCase {
 			false
 		);
 
-		WP_Mock::expectFilterAdded( 'rtcamp.google_redirect_url', [ $this->testee, 'redirect_url' ] );
+		WP_Mock::expectFilterAdded( 'rtcamp.oauth_redirect_url', [ $this->testee, 'redirect_url' ] );
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			1,
 			(object) [
@@ -176,18 +176,18 @@ class ShortCodeTest extends TestCase {
 
 		$this->ghClientMock->expects( $this->once() )
 		                   ->method( 'authorization_url' )
-		                   ->willReturn( 'https://google.com/auth/' );
+		                   ->willReturn( 'https://oauth.com/auth/' );
 
 
 		$helperMock = Mockery::mock( 'alias:' . Helper::class );
 		$helperMock->expects( 'render_template' )->once()->withArgs(
 			[
-				'/some/path/templates/google-login-button.php',
+				'/some/path/templates/oauth-login-button.php',
 				[
-					'button_text'   => 'Login with google',
+					'button_text'   => 'Login with oauth',
 					'force_display' => 'no',
 					'redirect_to'   => null,
-					'login_url'     => 'https://google.com/auth/',
+					'login_url'     => 'https://oauth.com/auth/',
 				],
 				false
 			]
@@ -225,7 +225,7 @@ class ShortCodeTest extends TestCase {
 
 		$this->assetMock->expects( $this->once() )->method( 'enqueue_login_styles' );
 
-		$output = $this->testee->scan_shortcode( 'Hello', 'google_login', [] );
+		$output = $this->testee->scan_shortcode( 'Hello', 'oauth_login', [] );
 		$this->assertSame( 'Hello', $output );
 	}
 
@@ -283,7 +283,7 @@ class ShortCodeTest extends TestCase {
 		$this->testee->redirect_uri = 'https://example.com';
 
 		$state = [
-			'provider'    => 'google',
+			'provider'    => 'oauth',
 			'redirect_to' => 'https://example.com'
 		];
 
@@ -298,7 +298,7 @@ class ShortCodeTest extends TestCase {
 		$this->testee->redirect_uri = null;
 
 		$state = [
-			'provider' => 'google'
+			'provider' => 'oauth'
 		];
 
 		$expected = $this->testee->state_redirect( $state );

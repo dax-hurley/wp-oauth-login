@@ -3,27 +3,27 @@
  * Block class.
  *
  * This is useful for registering custom gutenberg block to
- * add `Login with Google` button in desired place.
+ * add `WP OAuth Login` button in desired place.
  *
  * Particularly useful in FSE.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.2.3
  */
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Modules;
+namespace RtCamp\OAuthLogin\Modules;
 
-use RtCamp\GoogleLogin\Utils\Helper;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use RtCamp\GoogleLogin\Interfaces\Module;
-use function RtCamp\GoogleLogin\plugin;
+use RtCamp\OAuthLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use RtCamp\OAuthLogin\Interfaces\Module;
+use function RtCamp\OAuthLogin\plugin;
 
 /**
  * Class Block.
  *
- * @package RtCamp\GoogleLogin\Modules
+ * @package RtCamp\OAuthLogin\Modules
  */
 class Block implements Module {
 
@@ -32,7 +32,7 @@ class Block implements Module {
 	 *
 	 * @var string
 	 */
-	const SCRIPT_HANDLE = 'google-login-block';
+	const SCRIPT_HANDLE = 'oauth-login-block';
 
 	/**
 	 * Assets object.
@@ -42,9 +42,9 @@ class Block implements Module {
 	public $assets;
 
 	/**
-	 * Google client.
+	 * OAuth client.
 	 *
-	 * @var GoogleClient
+	 * @var OAuthClient
 	 */
 	public $client;
 
@@ -54,16 +54,16 @@ class Block implements Module {
 	 * @return string
 	 */
 	public function name(): string {
-		return 'google_login_block';
+		return 'oauth_login_block';
 	}
 
 	/**
 	 * Block constructor.
 	 *
 	 * @param Assets       $assets Assets object.
-	 * @param GoogleClient $client Google client object.
+	 * @param OAuthClient $client OAuth client object.
 	 */
-	public function __construct( Assets $assets, GoogleClient $client ) {
+	public function __construct( Assets $assets, OAuthClient $client ) {
 		$this->assets = $assets;
 		$this->client = $client;
 	}
@@ -102,7 +102,7 @@ class Block implements Module {
 	/**
 	 * Render callback for block.
 	 *
-	 * This will output the Login with Google
+	 * This will output the WP OAuth Login
 	 * button if user is not logged in currently.
 	 *
 	 * @param array $attributes Block attributes.
@@ -128,7 +128,7 @@ class Block implements Module {
 		if (
 			$force_display ||
 			! is_user_logged_in() ||
-			apply_filters( 'rtcamp.google_login_button_display', false )
+			apply_filters( 'rtcamp.oauth_login_button_display', false )
 		) {
 			$markup = $this->markup(
 				[
@@ -140,7 +140,7 @@ class Block implements Module {
 
 			ob_start();
 			?>
-			<div class="wp_google_login">
+			<div class="wp_oauth_login">
 				<?php echo wp_kses_post( $markup ); ?>
 			</div>
 			<?php
@@ -170,7 +170,7 @@ class Block implements Module {
 			]
 		);
 
-		$template = trailingslashit( plugin()->template_dir ) . 'google-login-button.php';
+		$template = trailingslashit( plugin()->template_dir ) . 'oauth-login-button.php';
 		return Helper::render_template( $template, $args, false );
 	}
 }

@@ -8,7 +8,7 @@ SCRIPT_DIR=$(dirname "$0")
 cd "$SCRIPT_DIR/.." || exit 1
 
 # Define environment variables
-PLUGIN_SLUG="login-with-google"
+PLUGIN_SLUG="login-with-oauth"
 
 # Extract version from readme.txt
 VERSION=$(grep -m1 "Stable tag:" readme.txt | awk '{print $NF}')

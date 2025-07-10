@@ -5,21 +5,21 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Utils;
+namespace RtCamp\OAuthLogin\Tests\Unit\Utils;
 
 use WP_Mock;
 use Exception;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Utils\GoogleClient as Testee;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Utils\OAuthClient as Testee;
 
 /**
- * Class GoogleClientTest
+ * Class OAuthClientTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Utils\GoogleClient
+ * @coversDefaultClass \RtCamp\OAuthLogin\Utils\OAuthClient
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Utils
+ * @package RtCamp\OAuthLogin\Tests\Unit\Utils
  */
-class GoogleClientTest extends TestCase {
+class OAuthClientTest extends TestCase {
 
 	/**
 	 * Object under test.
@@ -81,12 +81,12 @@ class GoogleClientTest extends TestCase {
 	 * @covers ::access_token
 	 */
 	public function testSetAccessToken() {
-		WP_Mock::expectFilter( 'rtcamp.google_redirect_url', '' );
+		WP_Mock::expectFilter( 'rtcamp.oauth_redirect_url', '' );
 
 		$this->wpMockFunction(
 			'wp_remote_post',
 			[
-				'https://oauth2.googleapis.com/token',
+				'https://oauth2.oauthapis.com/token',
 				[
 					'headers' => [
 						'Accept' => 'application/json',
@@ -139,12 +139,12 @@ class GoogleClientTest extends TestCase {
 	 * @covers ::set_access_token
 	 */
 	public function testSetAccessTokenThrowsException() {
-		WP_Mock::expectFilter( 'rtcamp.google_redirect_url', '' );
+		WP_Mock::expectFilter( 'rtcamp.oauth_redirect_url', '' );
 
 		$this->wpMockFunction(
 			'wp_remote_post',
 			[
-				'https://oauth2.googleapis.com/token',
+				'https://oauth2.oauthapis.com/token',
 				[
 					'headers' => [
 						'Accept' => 'application/json',
@@ -188,7 +188,7 @@ class GoogleClientTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_remote_post',
 			[
-				'https://oauth2.googleapis.com/token',
+				'https://oauth2.oauthapis.com/token',
 				[
 					'headers' => [
 						'Accept' => 'application/json',
@@ -228,16 +228,16 @@ class GoogleClientTest extends TestCase {
 		$this->wpMockFunction(
 			'trailingslashit',
 			[
-				'https://www.googleapis.com'
+				'https://www.oauthapis.com'
 			],
 			1,
-			'https://www.googleapis.com/'
+			'https://www.oauthapis.com/'
 		);
 
 		$this->wpMockFunction(
 			'wp_remote_get',
 			[
-				'https://www.googleapis.com/oauth2/v2/userinfo?access_token=someToken',
+				'https://www.oauthapis.com/oauth2/v2/userinfo?access_token=someToken',
 				[
 					'headers' => [
 						'Accept' => 'application/json',
@@ -288,16 +288,16 @@ class GoogleClientTest extends TestCase {
 		$this->wpMockFunction(
 			'trailingslashit',
 			[
-				'https://www.googleapis.com'
+				'https://www.oauthapis.com'
 			],
 			1,
-			'https://www.googleapis.com/'
+			'https://www.oauthapis.com/'
 		);
 
 		$this->wpMockFunction(
 			'wp_remote_get',
 			[
-				'https://www.googleapis.com/oauth2/v2/userinfo?access_token=someToken',
+				'https://www.oauthapis.com/oauth2/v2/userinfo?access_token=someToken',
 				[
 					'headers' => [
 						'Accept' => 'application/json',
@@ -326,7 +326,7 @@ class GoogleClientTest extends TestCase {
 	 */
 	public function testAuthorizationURL() {
 		$scope = [ 'email', 'profile', 'openid' ];
-		WP_Mock::onFilter( 'rtcamp.google_scope' )->with( $scope )->reply( $scope );
+		WP_Mock::onFilter( 'rtcamp.oauth_scope' )->with( $scope )->reply( $scope );
 		$ghClient = $this->createPartialMock( Testee::class, [ 'gt_redirect_url', 'state' ] );
 		$ghClient->expects( $this->once() )->method( 'gt_redirect_url' )->willReturn( '' );
 		$ghClient->expects( $this->once() )->method( 'state' )->willReturn( 'abcd' );
@@ -341,9 +341,9 @@ class GoogleClientTest extends TestCase {
 			'response_type' => 'code',
 		];
 
-		WP_Mock::expectFilter( 'rtcamp.google_client_args', $client_args );
+		WP_Mock::expectFilter( 'rtcamp.oauth_client_args', $client_args );
 
-		$expected = 'https://accounts.google.com/o/oauth2/auth?client_id=cid&redirect_uri=&state=abcd&scope=email+profile+openid&access_type=online&response_type=code';
+		$expected = 'https://accounts.oauth.com/o/oauth2/auth?client_id=cid&redirect_uri=&state=abcd&scope=email+profile+openid&access_type=online&response_type=code';
 
 		$this->assertSame( $expected, $ghClient->authorization_url() );
 	}

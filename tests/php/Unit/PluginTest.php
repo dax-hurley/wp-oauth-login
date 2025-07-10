@@ -5,22 +5,22 @@
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Tests\Unit;
+namespace RtCamp\OAuthLogin\Tests\Unit;
 
 use WP_Mock;
-use RtCamp\GoogleLogin\Plugin;
-use RtCamp\GoogleLogin\Container;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Plugin as Testee;
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\GoogleLogin\Interfaces\Container as ContainerInterface;
+use RtCamp\OAuthLogin\Plugin;
+use RtCamp\OAuthLogin\Container;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Plugin as Testee;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
 
 /**
  * Class PluginTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Plugin
+ * @coversDefaultClass \RtCamp\OAuthLogin\Plugin
  *
- * @package RtCamp\GoogleLogin\Tests\Unit
+ * @package RtCamp\OAuthLogin\Tests\Unit
  */
 class PluginTest extends TestCase {
 
@@ -85,7 +85,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-google.php'
+				'slashedstring/login-with-oauth.php'
 			]
 		);
 
@@ -93,7 +93,7 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			1,
-			'login-with-google'
+			'login-with-oauth'
 		);
 
 		$this->testee->run();
@@ -130,7 +130,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-google.php'
+				'slashedstring/login-with-oauth.php'
 			]
 		);
 
@@ -162,7 +162,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-google.php'
+				'slashedstring/login-with-oauth.php'
 			]
 		);
 
@@ -170,7 +170,7 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			1,
-			'login-with-google'
+			'login-with-oauth'
 		);
 
 		$this->testee->run();
@@ -202,7 +202,7 @@ class PluginTest extends TestCase {
 			'plugin_dir_url',
 			[
 				'args'       => [
-					'slashedstring/login-with-google.php'
+					'slashedstring/login-with-oauth.php'
 				],
 				'return_arg' => 0
 			]
@@ -212,12 +212,12 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			1,
-			'login-with-google'
+			'login-with-oauth'
 		);
 
 		$this->testee->run();
 
-		$this->assertSame( 'slashedstring/login-with-google.php', $this->testee->url );
+		$this->assertSame( 'slashedstring/login-with-oauth.php', $this->testee->url );
 	}
 
 	/**
@@ -243,7 +243,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-google.php'
+				'slashedstring/login-with-oauth.php'
 			]
 		);
 
@@ -275,7 +275,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-google.php'
+				'slashedstring/login-with-oauth.php'
 			]
 		);
 
@@ -283,12 +283,12 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			2,
-			'login-with-google'
+			'login-with-oauth'
 		);
 
 		WP_Mock::expectActionAdded( 'init', [ $this->testee, 'load_translations' ] );
-		WP_Mock::expectActionAdded( 'plugin_action_links_' . plugin_basename( $this->testee->path ) . '/login-with-google.php', [ $this->testee, 'add_plugin_action_links' ] );
-		WP_Mock::expectFilter( 'rtcamp.google_login_modules', $this->testee->active_modules );
+		WP_Mock::expectActionAdded( 'plugin_action_links_' . plugin_basename( $this->testee->path ) . '/login-with-oauth.php', [ $this->testee, 'add_plugin_action_links' ] );
+		WP_Mock::expectFilter( 'rtcamp.oauth_login_modules', $this->testee->active_modules );
 
 		$this->testee->run();
 		$this->assertConditionsMet();
@@ -315,7 +315,7 @@ class PluginTest extends TestCase {
 		);
 
 		$this->wpMockFunction(
-			'RtCamp\GoogleLogin\plugin',
+			'RtCamp\OAuthLogin\plugin',
 			[],
 			1,
 			function () {
@@ -328,7 +328,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'load_plugin_textdomain',
 			[
-				'login-with-google',
+				'login-with-oauth',
 				false,
 				'path-to-test/languages/en_US'
 			]
@@ -348,10 +348,10 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'admin_url',
 			[
-				'options-general.php?page=login-with-google',
+				'options-general.php?page=login-with-oauth',
 			],
 			1,
-			'http://example.test/wp-admin/options-general.php?page=login-with-google'
+			'http://example.test/wp-admin/options-general.php?page=login-with-oauth'
 		);
 
 		$actions = $this->testee->add_plugin_action_links( [] );
@@ -361,7 +361,7 @@ class PluginTest extends TestCase {
 		$this->assertIsArray( $actions, 'Plugin actions should be an array.');
 		$this->assertArrayHasKey( 'settings', $actions, 'Setting plugin action should exists.' );
 		$this->assertEquals(
-			'<a href="http://example.test/wp-admin/options-general.php?page=login-with-google">Settings</a>',
+			'<a href="http://example.test/wp-admin/options-general.php?page=login-with-oauth">Settings</a>',
 			$actions['settings'],
 			'Setting plugin action link is created.'
 		);

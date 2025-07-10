@@ -3,16 +3,16 @@
  * Register the settings under settings page and also
  * provide the interface to retrieve the settings.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  * @author rtCamp <contact@rtcamp.com>
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Modules;
+namespace RtCamp\OAuthLogin\Modules;
 
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
 
 /**
  * Class Settings.
@@ -24,7 +24,7 @@ use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
  * @property bool|null one_tap_login
  * @property string    one_tap_login_screen
  *
- * @package RtCamp\GoogleLogin\Modules
+ * @package RtCamp\OAuthLogin\Modules
  */
 class Settings implements ModuleInterface {
 
@@ -41,12 +41,12 @@ class Settings implements ModuleInterface {
 	 * @var string[]
 	 */
 	private $getters = [
-		'WP_GOOGLE_LOGIN_CLIENT_ID'         => 'client_id',
-		'WP_GOOGLE_LOGIN_SECRET'            => 'client_secret',
-		'WP_GOOGLE_LOGIN_USER_REGISTRATION' => 'registration_enabled',
-		'WP_GOOGLE_LOGIN_WHITELIST_DOMAINS' => 'whitelisted_domains',
-		'WP_GOOGLE_ONE_TAP_LOGIN'           => 'one_tap_login',
-		'WP_GOOGLE_ONE_TAP_LOGIN_SCREEN'    => 'one_tap_login_screen',
+		'WP_OAUTH_LOGIN_CLIENT_ID'         => 'client_id',
+		'WP_OAUTH_LOGIN_SECRET'            => 'client_secret',
+		'WP_OAUTH_LOGIN_USER_REGISTRATION' => 'registration_enabled',
+		'WP_OAUTH_LOGIN_WHITELIST_DOMAINS' => 'whitelisted_domains',
+		'WP_OAUTH_ONE_TAP_LOGIN'           => 'one_tap_login',
+		'WP_OAUTH_ONE_TAP_LOGIN_SCREEN'    => 'one_tap_login_screen',
 	];
 
 	/**
@@ -79,7 +79,7 @@ class Settings implements ModuleInterface {
 	 * @return void
 	 */
 	public function init(): void {
-		$this->options = get_option( 'wp_google_login_settings', [] );
+		$this->options = get_option( 'wp_oauth_login_settings', [] );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_menu', [ $this, 'settings_page' ] );
 	}
@@ -90,67 +90,67 @@ class Settings implements ModuleInterface {
 	 * @return void
 	 */
 	public function register_settings(): void {
-		register_setting( 'wp_google_login', 'wp_google_login_settings' );
+		register_setting( 'wp_oauth_login', 'wp_oauth_login_settings' );
 
 		add_settings_section(
-			'wp_google_login_section',
-			__( 'Log in with Google Settings', 'login-with-google' ),
+			'wp_oauth_login_section',
+			__( 'Log in with OAuth Settings', 'login-with-oauth' ),
 			function () {
 			},
-			'login-with-google'
+			'login-with-oauth'
 		);
 
 		add_settings_field(
-			'wp_google_login_client_id',
-			__( 'Client ID', 'login-with-google' ),
+			'wp_oauth_login_client_id',
+			__( 'Client ID', 'login-with-oauth' ),
 			[ $this, 'client_id_field' ],
-			'login-with-google',
-			'wp_google_login_section',
+			'login-with-oauth',
+			'wp_oauth_login_section',
 			[ 'label_for' => 'client-id' ]
 		);
 
 		add_settings_field(
-			'wp_google_login_client_secret',
-			__( 'Client Secret', 'login-with-google' ),
+			'wp_oauth_login_client_secret',
+			__( 'Client Secret', 'login-with-oauth' ),
 			[ $this, 'client_secret_field' ],
-			'login-with-google',
-			'wp_google_login_section',
+			'login-with-oauth',
+			'wp_oauth_login_section',
 			[ 'label_for' => 'client-secret' ]
 		);
 
 		add_settings_field(
-			'wp_google_allow_registration',
-			__( 'Create New User', 'login-with-google' ),
+			'wp_oauth_allow_registration',
+			__( 'Create New User', 'login-with-oauth' ),
 			[ $this, 'user_registration' ],
-			'login-with-google',
-			'wp_google_login_section',
+			'login-with-oauth',
+			'wp_oauth_login_section',
 			[ 'label_for' => 'user-registration' ]
 		);
 
 		add_settings_field(
-			'wp_google_one_tap_login',
-			__( 'Enable One Tap Login', 'login-with-google' ),
+			'wp_oauth_one_tap_login',
+			__( 'Enable One Tap Login', 'login-with-oauth' ),
 			[ $this, 'one_tap_login' ],
-			'login-with-google',
-			'wp_google_login_section',
+			'login-with-oauth',
+			'wp_oauth_login_section',
 			[ 'label_for' => 'one-tap-login' ]
 		);
 
 		add_settings_field(
-			'wp_google_one_tap_login_screen',
-			__( 'One Tap Login Locations', 'login-with-google' ),
+			'wp_oauth_one_tap_login_screen',
+			__( 'One Tap Login Locations', 'login-with-oauth' ),
 			[ $this, 'one_tap_login_screens' ],
-			'login-with-google',
-			'wp_google_login_section',
+			'login-with-oauth',
+			'wp_oauth_login_section',
 			[ 'label_for' => 'one-tap-login-screen' ]
 		);
 
 		add_settings_field(
-			'wp_google_whitelisted_domain',
-			__( 'Whitelisted Domains', 'login-with-google' ),
+			'wp_oauth_whitelisted_domain',
+			__( 'Whitelisted Domains', 'login-with-oauth' ),
 			[ $this, 'whitelisted_domains' ],
-			'login-with-google',
-			'wp_google_login_section',
+			'login-with-oauth',
+			'wp_oauth_login_section',
 			[ 'label_for' => 'whitelisted-domains' ]
 		);
 	}
@@ -162,15 +162,15 @@ class Settings implements ModuleInterface {
 	 */
 	public function client_id_field(): void {
 		?>
-		<input type='text' name='wp_google_login_settings[client_id]' id="client-id" value='<?php echo esc_attr( $this->client_id ); ?>' autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
+		<input type='text' name='wp_oauth_login_settings[client_id]' id="client-id" value='<?php echo esc_attr( $this->client_id ); ?>' autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
 		<p class="description">
 			<?php
 			echo wp_kses_post(
 				sprintf(
 					'<p>%1s <a target="_blank" href="%2s">%3s</a>.</p>',
-					esc_html__( 'Create oAuth Client ID and Client Secret at', 'login-with-google' ),
-					'https://console.developers.google.com/apis/dashboard',
-					'console.developers.google.com'
+					esc_html__( 'Create oAuth Client ID and Client Secret at', 'login-with-oauth' ),
+					'https://console.developers.oauth.com/apis/dashboard',
+					'console.developers.oauth.com'
 				)
 			);
 			?>
@@ -185,7 +185,7 @@ class Settings implements ModuleInterface {
 	 */
 	public function client_secret_field(): void {
 		?>
-		<input type='password' name='wp_google_login_settings[client_secret]' id="client-secret" value='<?php echo esc_attr( $this->client_secret ); ?>' autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
+		<input type='password' name='wp_oauth_login_settings[client_secret]' id="client-secret" value='<?php echo esc_attr( $this->client_secret ); ?>' autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
 		<?php
 	}
 
@@ -202,17 +202,17 @@ class Settings implements ModuleInterface {
 	public function user_registration(): void {
 		?>
 		<label style='display:block;margin-top:6px;'><input <?php $this->disabled( 'registration_enabled' ); ?> type='checkbox'
-															name='wp_google_login_settings[registration_enabled]'
+															name='wp_oauth_login_settings[registration_enabled]'
 															id="user-registration" <?php echo esc_attr( checked( $this->registration_enabled ) ); ?>
 															value='1'>
-			<?php esc_html_e( 'Create a new user account if it does not exist already', 'login-with-google' ); ?>
+			<?php esc_html_e( 'Create a new user account if it does not exist already', 'login-with-oauth' ); ?>
 		</label>
 		<p class="description">
 			<?php
 			echo wp_kses_post(
 				sprintf(
 				/* translators: %1s will be replaced by page link */
-					__( 'If this setting is checked, a new user will be created even if <a target="_blank" href="%1s">membership setting</a> is off.', 'login-with-google' ),
+					__( 'If this setting is checked, a new user will be created even if <a target="_blank" href="%1s">membership setting</a> is off.', 'login-with-oauth' ),
 					is_multisite() ? 'network/settings.php' : 'options-general.php'
 				)
 			);
@@ -230,10 +230,10 @@ class Settings implements ModuleInterface {
 		?>
 		<label style='display:block;margin-top:6px;'><input <?php $this->disabled( 'one_tap_login' ); ?>
 					type='checkbox'
-					name='wp_google_login_settings[one_tap_login]'
+					name='wp_oauth_login_settings[one_tap_login]'
 					id="one-tap-login" <?php echo esc_attr( checked( $this->one_tap_login ) ); ?>
 					value='1'>
-			<?php esc_html_e( 'One Tap Login', 'login-with-google' ); ?>
+			<?php esc_html_e( 'One Tap Login', 'login-with-oauth' ); ?>
 		</label>
 		<?php
 	}
@@ -250,17 +250,17 @@ class Settings implements ModuleInterface {
 		?>
 		<label style='display:block;margin-top:6px;'><input <?php $this->disabled( 'one_tap_login' ); ?>
 					type='radio'
-					name='wp_google_login_settings[one_tap_login_screen]'
+					name='wp_oauth_login_settings[one_tap_login_screen]'
 					id="one-tap-login-screen-login" <?php echo esc_attr( checked( $this->one_tap_login_screen, $default ) ); ?>
 					value='login'>
-			<?php esc_html_e( 'Enable One Tap Login Only on Login Screen', 'login-with-google' ); ?>
+			<?php esc_html_e( 'Enable One Tap Login Only on Login Screen', 'login-with-oauth' ); ?>
 		</label>
 		<label style='display:block;margin-top:6px;'><input <?php $this->disabled( 'one_tap_login' ); ?>
 					type='radio'
-					name='wp_google_login_settings[one_tap_login_screen]'
+					name='wp_oauth_login_settings[one_tap_login_screen]'
 					id="one-tap-login-screen-sitewide" <?php echo esc_attr( checked( $this->one_tap_login_screen, 'sitewide' ) ); ?>
 					value='sitewide'>
-			<?php esc_html_e( 'Enable One Tap Login Site-wide', 'login-with-google' ); ?>
+			<?php esc_html_e( 'Enable One Tap Login Site-wide', 'login-with-oauth' ); ?>
 		</label>
 		<?php
 		// phpcs:disable
@@ -297,9 +297,9 @@ class Settings implements ModuleInterface {
 	 */
 	public function whitelisted_domains(): void {
 		?>
-		<input <?php $this->disabled( 'whitelisted_domains' ); ?> type='text' name='wp_google_login_settings[whitelisted_domains]' id="whitelisted-domains" value='<?php echo esc_attr( $this->whitelisted_domains ); ?>' autocomplete="off" />
+		<input <?php $this->disabled( 'whitelisted_domains' ); ?> type='text' name='wp_oauth_login_settings[whitelisted_domains]' id="whitelisted-domains" value='<?php echo esc_attr( $this->whitelisted_domains ); ?>' autocomplete="off" />
 		<p class="description">
-			<?php echo esc_html( __( 'Add each domain comma separated', 'login-with-google' ) ); ?>
+			<?php echo esc_html( __( 'Add each domain comma separated', 'login-with-oauth' ) ); ?>
 		</p>
 		<?php
 	}
@@ -311,10 +311,10 @@ class Settings implements ModuleInterface {
 	 */
 	public function settings_page(): void {
 		add_options_page(
-			__( 'Login with Google settings', 'login-with-google' ),
-			__( 'Login with Google', 'login-with-google' ),
+			__( 'WP OAuth Login settings', 'login-with-oauth' ),
+			__( 'WP OAuth Login', 'login-with-oauth' ),
 			'manage_options',
-			'login-with-google',
+			'login-with-oauth',
 			[ $this, 'output' ]
 		);
 	}
@@ -329,8 +329,8 @@ class Settings implements ModuleInterface {
 		<div class="wrap">
 		<form action='options.php' method='post'>
 			<?php
-			settings_fields( 'wp_google_login' );
-			do_settings_sections( 'login-with-google' );
+			settings_fields( 'wp_oauth_login' );
+			do_settings_sections( 'login-with-oauth' );
 			submit_button();
 			?>
 		</form>

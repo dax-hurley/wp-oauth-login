@@ -4,29 +4,29 @@
  *
  * This will verify the token based on asymmetric encryption.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.16
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Utils;
+namespace RtCamp\OAuthLogin\Utils;
 
 use Requests_Utility_CaseInsensitiveDictionary;
 use Exception;
-use RtCamp\GoogleLogin\Modules\Settings;
+use RtCamp\OAuthLogin\Modules\Settings;
 use stdClass;
 
 /**
  * Class TokenVerifier
  *
- * @package RtCamp\GoogleLogin\Utils
+ * @package RtCamp\OAuthLogin\Utils
  */
 class TokenVerifier {
 	/**
 	 * Get list of public keys to verify signature.
 	 */
-	const CERTS_URL = 'https://www.googleapis.com/oauth2/v1/certs';
+	const CERTS_URL = 'https://www.oauthapis.com/oauth2/v1/certs';
 
 	/**
 	 * List of supported algorithms.
@@ -40,7 +40,7 @@ class TokenVerifier {
 	];
 
 	/**
-	 * ID Token Sent via Google.
+	 * ID Token Sent via OAuth.
 	 *
 	 * @var string
 	 */
@@ -87,7 +87,7 @@ class TokenVerifier {
 	/**
 	 * Verify if a token is valid or not.
 	 *
-	 * @param string $token Received ID token from Google.
+	 * @param string $token Received ID token from OAuth.
 	 *
 	 * @return bool
 	 * @throws Exception Token verification failure exception.
@@ -103,7 +103,7 @@ class TokenVerifier {
 			return true;
 		} catch ( Exception $e ) {
 
-			do_action( 'rtcamp.login_with_google_exception', $e );
+			do_action( 'rtcamp.login_with_oauth_exception', $e );
 
 			throw $e;
 		}
@@ -134,7 +134,7 @@ class TokenVerifier {
 	/**
 	 * Retrieve current user's data.
 	 *
-	 * Current user is Google user, not WP user.
+	 * Current user is OAuth user, not WP user.
 	 *
 	 * @return stdClass|null
 	 */
@@ -203,7 +203,7 @@ class TokenVerifier {
 		$parts = explode( '.', $this->token );
 
 		if ( ! is_array( $parts ) || 3 !== count( $parts ) ) {
-			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-oauth' ) );
 		}
 
 		list( $header, $payload, $obtained_signature ) = $parts;
@@ -211,7 +211,7 @@ class TokenVerifier {
 		$payload                                       = $this->base64_decode_url( $payload );
 
 		if ( ! $header || ! $payload ) {
-			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-oauth' ) );
 		}
 
 		return [
@@ -240,7 +240,7 @@ class TokenVerifier {
 		);
 
 		if ( ! $parsed_header['kid'] || ! $parsed_header['alg'] ) {
-			throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-oauth' ) );
 		}
 
 		$pubkey_pem           = $this->get_public_key( $parsed_header['kid'] );
@@ -254,7 +254,7 @@ class TokenVerifier {
 			return;
 		}
 
-		throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-google' ) );
+		throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-oauth' ) );
 	}
 
 	/**
@@ -264,19 +264,19 @@ class TokenVerifier {
 	 */
 	private function valid_data(): void {
 		if ( is_null( $this->current_user ) ) {
-			throw new Exception( esc_html__( 'No user present to validate', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'No user present to validate', 'login-with-oauth' ) );
 		}
 
 		if ( $this->settings->client_id !== $this->current_user->aud ) {
-			throw new Exception( esc_html__( 'Invalid data found for authentication', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'Invalid data found for authentication', 'login-with-oauth' ) );
 		}
 
-		if ( ! in_array( $this->current_user->iss, [ 'accounts.google.com', 'https://accounts.google.com' ], true ) ) {
-			throw new Exception( esc_html__( 'Invalid source found for authentication', 'login-with-google' ) );
+		if ( ! in_array( $this->current_user->iss, [ 'accounts.oauth.com', 'https://accounts.oauth.com' ], true ) ) {
+			throw new Exception( esc_html__( 'Invalid source found for authentication', 'login-with-oauth' ) );
 		}
 
 		if ( $this->current_user->exp < strtotime( 'now' ) ) {
-			throw new Exception( esc_html__( 'User data is stale! Please try again.', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'User data is stale! Please try again.', 'login-with-oauth' ) );
 		}
 	}
 

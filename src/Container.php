@@ -7,31 +7,31 @@
  * useful for defining services and serves as service
  * locator.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.0.0
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin;
+namespace RtCamp\OAuthLogin;
 
-use RtCamp\GoogleLogin\Interfaces\Container as ContainerInterface;
+use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
 use Pimple\Container as PimpleContainer;
 use InvalidArgumentException;
-use RtCamp\GoogleLogin\Modules\Assets;
-use RtCamp\GoogleLogin\Modules\Block;
-use RtCamp\GoogleLogin\Modules\Login;
-use RtCamp\GoogleLogin\Modules\OneTapLogin;
-use RtCamp\GoogleLogin\Modules\Settings;
-use RtCamp\GoogleLogin\Utils\Authenticator;
-use RtCamp\GoogleLogin\Utils\GoogleClient;
-use RtCamp\GoogleLogin\Modules\Shortcode;
-use RtCamp\GoogleLogin\Utils\TokenVerifier;
+use RtCamp\OAuthLogin\Modules\Assets;
+use RtCamp\OAuthLogin\Modules\Block;
+use RtCamp\OAuthLogin\Modules\Login;
+use RtCamp\OAuthLogin\Modules\OneTapLogin;
+use RtCamp\OAuthLogin\Modules\Settings;
+use RtCamp\OAuthLogin\Utils\Authenticator;
+use RtCamp\OAuthLogin\Utils\OAuthClient;
+use RtCamp\OAuthLogin\Modules\Shortcode;
+use RtCamp\OAuthLogin\Utils\TokenVerifier;
 
 /**
  * Class Container
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 class Container implements ContainerInterface {
 	/**
@@ -63,7 +63,7 @@ class Container implements ContainerInterface {
 		if ( ! in_array( $service, $this->container->keys(), true ) ) {
 			$error_message = sprintf(
 				/* translators: %$s is replaced with requested service name. */
-				__( 'Invalid Service %s Passed to the container', 'login-with-google' ),
+				__( 'Invalid Service %s Passed to the container', 'login-with-oauth' ),
 				$service
 			);
 
@@ -105,16 +105,16 @@ class Container implements ContainerInterface {
 		};
 
 		/**
-		 * Define a service for Google OAuth client.
+		 * Define a service for OAuth OAuth client.
 		 *
 		 * @param PimpleContainer $c Pimple container instance.
 		 *
-		 * @return GoogleClient
+		 * @return OAuthClient
 		 */
 		$this->container['gh_client'] = function ( PimpleContainer $c ) {
 			$settings = $c['settings'];
 
-			return new GoogleClient(
+			return new OAuthClient(
 				[
 					'client_id'     => $settings->client_id,
 					'client_secret' => $settings->client_secret,
@@ -133,7 +133,7 @@ class Container implements ContainerInterface {
 		};
 
 		/**
-		 * Define Shortcode service to register shortcode for google login.
+		 * Define Shortcode service to register shortcode for oauth login.
 		 *
 		 * @param PimpleContainer $c Pimple container object.
 		 *
@@ -185,7 +185,7 @@ class Container implements ContainerInterface {
 		 *
 		 * @return Block
 		 */
-		$this->container['google_login_block'] = function ( PimpleContainer $c ) {
+		$this->container['oauth_login_block'] = function ( PimpleContainer $c ) {
 			return new Block( $c['assets'], $c['gh_client'] );
 		};
 
@@ -197,6 +197,6 @@ class Container implements ContainerInterface {
 		 *
 		 * @since 1.0.0
 		 */
-		do_action( 'rtcamp.google_login_services', $this );
+		do_action( 'rtcamp.oauth_login_services', $this );
 	}
 }

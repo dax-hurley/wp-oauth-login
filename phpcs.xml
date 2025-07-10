@@ -6,7 +6,7 @@
     <rule ref="PHPCompatibilityWP"/>
 
     <file>src</file>
-    <file>login-with-google.php</file>
+    <file>login-with-oauth.php</file>
 
     <rule ref="WordPress-Core">
         <exclude name="Universal.Operators.DisallowShortTernary" />
@@ -26,7 +26,7 @@
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" type="array">
-                <element value="login-with-google" />
+                <element value="login-with-oauth" />
             </property>
         </properties>
     </rule>

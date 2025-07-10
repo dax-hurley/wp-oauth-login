@@ -5,19 +5,19 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Modules;
+namespace RtCamp\OAuthLogin\Tests\Unit\Modules;
 
 use WP_Mock;
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Modules\Settings as Testee;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Modules\Settings as Testee;
 
 /**
  * Class SettingsTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Modules\Settings
+ * @coversDefaultClass \RtCamp\OAuthLogin\Modules\Settings
  *
- * @package RtCamp\GoogleLogin\Tests\Unit\Modules
+ * @package RtCamp\OAuthLogin\Tests\Unit\Modules
  */
 class SettingsTest extends TestCase {
 	/**
@@ -62,7 +62,7 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'get_option',
 			[
-				'wp_google_login_settings',
+				'wp_oauth_login_settings',
 				[]
 			],
 			1,
@@ -83,7 +83,7 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'get_option',
 			[
-				'wp_google_login_settings',
+				'wp_oauth_login_settings',
 				[]
 			],
 			1,
@@ -104,8 +104,8 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'register_setting',
 			[
-				'wp_google_login',
-				'wp_google_login_settings'
+				'wp_oauth_login',
+				'wp_oauth_login_settings'
 			],
 			1,
 			true
@@ -114,10 +114,10 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'add_settings_section',
 			[
-				'wp_google_login_section',
-				'Log in with Google Settings',
+				'wp_oauth_login_section',
+				'Log in with OAuth Settings',
 				\Closure::class,
-				'login-with-google'
+				'login-with-oauth'
 			],
 			1
 		);
@@ -148,10 +148,10 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'add_options_page',
 			[
-				'Login with Google settings',
-				'Login with Google',
+				'WP OAuth Login settings',
+				'WP OAuth Login',
 				'manage_options',
-				'login-with-google',
+				'login-with-oauth',
 				[
 					$this->testee,
 					'output'
@@ -170,7 +170,7 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'settings_fields',
 			[
-				'wp_google_login',
+				'wp_oauth_login',
 			],
 			1
 		);
@@ -178,7 +178,7 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'do_settings_sections',
 			[
-				'login-with-google',
+				'login-with-oauth',
 			],
 			1
 		);
@@ -203,7 +203,7 @@ class SettingsTest extends TestCase {
 			'esc_html__',
 			[
 				'Create oAuth Client ID and Client Secret at',
-				'login-with-google'
+				'login-with-oauth'
 			],
 			2,
 		);
@@ -213,9 +213,9 @@ class SettingsTest extends TestCase {
 			[
 				sprintf(
 					'<p>%1s <a target="_blank" href="%2s">%3s</a>.</p>',
-					esc_html__( 'Create oAuth Client ID and Client Secret at', 'login-with-google' ),
-					'https://console.developers.google.com/apis/dashboard',
-					'console.developers.google.com'
+					esc_html__( 'Create oAuth Client ID and Client Secret at', 'login-with-oauth' ),
+					'https://console.developers.oauth.com/apis/dashboard',
+					'console.developers.oauth.com'
 				)
 			],
 			1,
@@ -244,7 +244,7 @@ class SettingsTest extends TestCase {
 			'esc_html_e',
 			[
 				'Create a new user account if it does not exist already',
-				'login-with-google'
+				'login-with-oauth'
 			],
 			1,
 		);
@@ -260,7 +260,7 @@ class SettingsTest extends TestCase {
 			'wp_kses_post',
 			[
 				/* translators: %1s will be replaced by page link */
-				__( 'If this setting is checked, a new user will be created even if <a target="_blank" href="network/settings.php">membership setting</a> is off.', 'login-with-google' ),
+				__( 'If this setting is checked, a new user will be created even if <a target="_blank" href="network/settings.php">membership setting</a> is off.', 'login-with-oauth' ),
 			],
 			1,
 		);
@@ -287,7 +287,7 @@ class SettingsTest extends TestCase {
 		$this->wpMockFunction(
 			'esc_html',
 			[
-				__( 'Add each domain comma separated', 'login-with-google' )
+				__( 'Add each domain comma separated', 'login-with-oauth' )
 			],
 			1,
 		);

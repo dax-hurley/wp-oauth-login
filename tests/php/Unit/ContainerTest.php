@@ -5,22 +5,22 @@
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Tests\Unit;
+namespace RtCamp\OAuthLogin\Tests\Unit;
 
 use Mockery;
 use InvalidArgumentException;
 use Pimple\Container as PimpleContainer;
-use RtCamp\GoogleLogin\Container;
-use RtCamp\GoogleLogin\Container as Testee;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Interfaces\Container as ContainerInterface;
+use RtCamp\OAuthLogin\Container;
+use RtCamp\OAuthLogin\Container as Testee;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Interfaces\Container as ContainerInterface;
 
 /**
  * Class ContainerTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Container
+ * @coversDefaultClass \RtCamp\OAuthLogin\Container
  *
- * @package RtCamp\GoogleLogin\Tests\Unit
+ * @package RtCamp\OAuthLogin\Tests\Unit
  */
 class ContainerTest extends  TestCase {
 

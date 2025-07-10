@@ -1,7 +1,7 @@
 /**
  * Webpack mix file.
  *
- * @package login-with-google
+ * @package login-with-oauth
  */
 
 let mix = require( 'laravel-mix' );

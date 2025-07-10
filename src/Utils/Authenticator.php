@@ -5,25 +5,25 @@
  * This will authenticate the user. Also responsible for registration
  * in case it is enabled in the settings.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since 1.1.1
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Utils;
+namespace RtCamp\OAuthLogin\Utils;
 
 use WP_User;
 use stdClass;
 use Exception;
 use Throwable;
 use InvalidArgumentException;
-use RtCamp\GoogleLogin\Modules\Settings;
+use RtCamp\OAuthLogin\Modules\Settings;
 
 /**
  * Class Authenticator
  *
- * @package RtCamp\GoogleLogin\Utils
+ * @package RtCamp\OAuthLogin\Utils
  */
 class Authenticator {
 	/**
@@ -48,14 +48,14 @@ class Authenticator {
 	 * If registration setting is on, user will be created if
 	 * that user does not exist in the application.
 	 *
-	 * @param stdClass $user User data object returned by Google.
+	 * @param stdClass $user User data object returned by OAuth.
 	 *
 	 * @return WP_User
 	 * @throws InvalidArgumentException For invalid registrations.
 	 */
 	public function authenticate( stdClass $user ): WP_User {
 		if ( ! property_exists( $user, 'email' ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Email needs to be present for the user.', 'login-with-google' ) );
+			throw new InvalidArgumentException( esc_html__( 'Email needs to be present for the user.', 'login-with-oauth' ) );
 		}
 
 		if ( email_exists( $user->email ) ) {
@@ -67,9 +67,9 @@ class Authenticator {
 			 * @since 1.3.0
 			 *
 			 * @param WP_User $user_wp WP User data object.
-			 * @param stdClass $user User data object returned by Google.
+			 * @param stdClass $user User data object returned by OAuth.
 			 */
-			do_action( 'rtcamp.google_user_logged_in', $user_wp, $user );
+			do_action( 'rtcamp.oauth_user_logged_in', $user_wp, $user );
 
 			return $user_wp;
 		}
@@ -77,16 +77,16 @@ class Authenticator {
 		/**
 		 * Check if we need to register the user.
 		 *
-		 * @param stdClass $user User object from google.
+		 * @param stdClass $user User object from oauth.
 		 * @since 1.0.0
 		 */
-		return apply_filters( 'rtcamp.google_register_user', $this->maybe_create_username( $user ) );
+		return apply_filters( 'rtcamp.oauth_register_user', $this->maybe_create_username( $user ) );
 	}
 
 	/**
 	 * Register the new user if setting is on for registration.
 	 *
-	 * @param stdClass $user User object from google.
+	 * @param stdClass $user User object from oauth.
 	 *
 	 * @return WP_User|null
 	 * @throws Throwable Invalid email registration.
@@ -96,7 +96,7 @@ class Authenticator {
 		$register = true === (bool) $this->settings->registration_enabled || (bool) get_option( 'users_can_register', false );
 
 		if ( ! $register ) {
-			throw new Exception( esc_html__( 'Registration is not allowed.', 'login-with-google' ) );
+			throw new Exception( esc_html__( 'Registration is not allowed.', 'login-with-oauth' ) );
 		}
 
 		try {
@@ -115,13 +115,13 @@ class Authenticator {
 				/**
 				 * Fires once the user has been registered successfully.
 				 */
-				do_action( 'rtcamp.google_user_created', $uid, $user );
+				do_action( 'rtcamp.oauth_user_created', $uid, $user );
 
 				return get_user_by( 'id', $uid );
 			}
 
 			/* translators: %s is replaced with email ID of user trying to register */
-			throw new Exception( sprintf( __( 'Cannot register with this email: %s', 'login-with-google' ), $user->email ) );
+			throw new Exception( sprintf( __( 'Cannot register with this email: %s', 'login-with-oauth' ), $user->email ) );
 
 		} catch ( Throwable $e ) {
 

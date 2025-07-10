@@ -4,7 +4,7 @@ set -ex
 
 ######################################################
 ######################## VARS ########################
-SITE_NAME='login-with-google.com'
+SITE_NAME='login-with-oauth.com'
 SITE_ROOT="/var/www/$SITE_NAME/htdocs"
 SITE_URL="http://$SITE_NAME/"
 function ee() { wo "$@"; }
@@ -28,11 +28,11 @@ function create_and_configure_site () {
 
     ee site create $SITE_NAME --wp --php74 
     cd $SITE_ROOT/wp-content/plugins/
-    mkdir login-with-google
-    rsync -azh $GITHUB_WORKSPACE/ $SITE_ROOT/wp-content/plugins/login-with-google
+    mkdir login-with-oauth
+    rsync -azh $GITHUB_WORKSPACE/ $SITE_ROOT/wp-content/plugins/login-with-oauth
     echo "127.0.0.1 $SITE_NAME" >> /etc/hosts
     ls
-    wp plugin activate login-with-google --allow-root
+    wp plugin activate login-with-oauth --allow-root
     wp user create automation automation@example.com --role=administrator --user_pass=automation --allow-root
     wp theme activate twentytwentyone --allow-root
 }

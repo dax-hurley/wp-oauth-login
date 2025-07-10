@@ -2,26 +2,26 @@
 /**
  * Test for Authenticator class.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 
 declare(strict_types=1);
 
-namespace RtCamp\GoogleLogin\Tests\Unit\Utils;
+namespace RtCamp\OAuthLogin\Tests\Unit\Utils;
 
 use WP_Mock;
 use Mockery;
-use RtCamp\GoogleLogin\Utils\Helper;
-use RtCamp\GoogleLogin\Modules\Settings;
-use RtCamp\GoogleLogin\Tests\TestCase;
-use RtCamp\GoogleLogin\Utils\Authenticator as Testee;
+use RtCamp\OAuthLogin\Utils\Helper;
+use RtCamp\OAuthLogin\Modules\Settings;
+use RtCamp\OAuthLogin\Tests\TestCase;
+use RtCamp\OAuthLogin\Utils\Authenticator as Testee;
 
 /**
  * Class AuthenticatorTest
  *
- * @coversDefaultClass \RtCamp\GoogleLogin\Utils\Authenticator
+ * @coversDefaultClass \RtCamp\OAuthLogin\Utils\Authenticator
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 class AuthenticatorTest extends TestCase {
 
@@ -138,7 +138,7 @@ class AuthenticatorTest extends TestCase {
 		           ->once()
 		           ->withArgs( ['test'] );
 
-		WP_Mock::onFilter( 'rtcamp.google_register_user' )->with( $user )->reply( $wp_user );
+		WP_Mock::onFilter( 'rtcamp.oauth_register_user' )->with( $user )->reply( $wp_user );
 
 		$this->testee->authenticate( $user );
 		$this->assertConditionsMet();
@@ -221,7 +221,7 @@ class AuthenticatorTest extends TestCase {
 			100
 		);
 
-		WP_Mock::expectAction( 'rtcamp.google_user_created', 100, $user );
+		WP_Mock::expectAction( 'rtcamp.oauth_user_created', 100, $user );
 
 		$wp_user = Mockery::mock( \WP_User::class );
 
@@ -283,7 +283,7 @@ class AuthenticatorTest extends TestCase {
 			100
 		);
 
-		WP_Mock::expectAction( 'rtcamp.google_user_created', 100, $user );
+		WP_Mock::expectAction( 'rtcamp.oauth_user_created', 100, $user );
 
 		$wp_user = Mockery::mock( \WP_User::class );
 
@@ -346,7 +346,7 @@ class AuthenticatorTest extends TestCase {
 			100
 		);
 
-		WP_Mock::expectAction( 'rtcamp.google_user_created', 100, $user );
+		WP_Mock::expectAction( 'rtcamp.oauth_user_created', 100, $user );
 
 		$wp_user = Mockery::mock( \WP_User::class );
 

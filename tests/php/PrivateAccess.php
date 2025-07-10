@@ -2,10 +2,10 @@
 /**
  * Trait to access/test private methods/properties.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  */
 
-namespace RtCamp\GoogleLogin\Tests;
+namespace RtCamp\OAuthLogin\Tests;
 
 use ReflectionClass;
 use ReflectionException;

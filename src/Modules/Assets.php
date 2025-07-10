@@ -5,21 +5,21 @@
  * This will manage the assets file (css/js)
  * for adding style and JS functionality.
  *
- * @package RtCamp\GoogleLogin
+ * @package RtCamp\OAuthLogin
  * @since   1.0.0
  */
 
 declare( strict_types=1 );
 
-namespace RtCamp\GoogleLogin\Modules;
+namespace RtCamp\OAuthLogin\Modules;
 
-use RtCamp\GoogleLogin\Interfaces\Module as ModuleInterface;
-use function RtCamp\GoogleLogin\plugin;
+use RtCamp\OAuthLogin\Interfaces\Module as ModuleInterface;
+use function RtCamp\OAuthLogin\plugin;
 
 /**
  * Class Assets
  *
- * @package RtCamp\GoogleLogin\Modules
+ * @package RtCamp\OAuthLogin\Modules
  */
 class Assets implements ModuleInterface {
 
@@ -28,7 +28,7 @@ class Assets implements ModuleInterface {
 	 *
 	 * @var string
 	 */
-	const LOGIN_BUTTON_STYLE_HANDLE = 'login-with-google';
+	const LOGIN_BUTTON_STYLE_HANDLE = 'login-with-oauth';
 
 	/**
 	 * Module name.
@@ -72,11 +72,11 @@ class Assets implements ModuleInterface {
 			$this->register_login_styles();
 		}
 
-		if ( ! wp_script_is( 'login-with-google-script', 'registered' ) ) {
-			$this->register_script( 'login-with-google-script', 'build/js/login.js' );
+		if ( ! wp_script_is( 'login-with-oauth-script', 'registered' ) ) {
+			$this->register_script( 'login-with-oauth-script', 'build/js/login.js' );
 		}
 
-		wp_enqueue_script( 'login-with-google-script' );
+		wp_enqueue_script( 'login-with-oauth-script' );
 		wp_enqueue_style( self::LOGIN_BUTTON_STYLE_HANDLE );
 	}
 
