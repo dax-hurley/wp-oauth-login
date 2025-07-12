@@ -184,7 +184,7 @@ class Login implements ModuleInterface {
 				return $user;
 			}
 
-			throw new Exception( __( 'Could not authenticate the user, please try again.', 'login-with-oauth' ) );
+			throw new Exception( __( 'Could not authenticate the user, please try again.', 'wp-oauth-login' ) );
 
 		} catch ( Throwable $e ) {
 			return new WP_Error( 'oauth_login_failed', $e->getMessage() );

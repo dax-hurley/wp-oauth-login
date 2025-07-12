@@ -59,7 +59,7 @@ class OAuthClient {
 		];
 
 		if ( in_array( $name, $methods, true ) && empty( $this->access_token ) ) {
-			throw new Exception( esc_html__( 'Access token must be set to make this API call', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Access token must be set to make this API call', 'wp-oauth-login' ) );
 		}
 	}
 

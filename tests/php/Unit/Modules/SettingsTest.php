@@ -49,6 +49,7 @@ class SettingsTest extends TestCase {
 		WP_Mock::userFunction( 'is_multisite', [ 'return' => false ] );
 		WP_Mock::userFunction( 'checked', [ 'return' => 'checked' ] );
 		WP_Mock::userFunction( 'admin_url', [ 'return' => 'http://example.com/wp-admin/' ] );
+		WP_Mock::userFunction( 'wp_login_url', [ 'return' => 'http://example.com/wp-login.php' ] );
 		WP_Mock::userFunction( 'wp_redirect' );
 		WP_Mock::userFunction( 'wp_die' );
 		WP_Mock::userFunction( 'wp_send_json_success' );
@@ -86,6 +87,7 @@ class SettingsTest extends TestCase {
 		$provider_manager->shouldReceive( 'validate_provider_config' )->andReturn( true );
 		$provider_manager->shouldReceive( 'save_provider_config' )->andReturn( true );
 		$provider_manager->shouldReceive( 'delete_provider_config' )->andReturn( true );
+		$provider_manager->shouldReceive( 'get_provider_config' )->andReturn( [] );
 
 		// Create Settings instance using reflection to inject the mock
 		$settings = new \ReflectionClass( Settings::class );
@@ -123,6 +125,7 @@ class SettingsTest extends TestCase {
 		WP_Mock::expectActionAdded( 'admin_menu', [ $this->settings, 'settings_page' ] );
 		WP_Mock::expectActionAdded( 'wp_ajax_save_provider', [ $this->settings, 'save_provider_ajax' ] );
 		WP_Mock::expectActionAdded( 'wp_ajax_delete_provider', [ $this->settings, 'delete_provider_ajax' ] );
+		WP_Mock::expectActionAdded( 'wp_ajax_get_provider', [ $this->settings, 'get_provider_ajax' ] );
 		WP_Mock::expectActionAdded( 'admin_notices', [ $this->settings, 'show_migration_notice' ] );
 		WP_Mock::expectActionAdded( 'admin_init', [ $this->settings, 'handle_migration' ] );
 
@@ -291,6 +294,65 @@ class SettingsTest extends TestCase {
 	}
 
 	/**
+	 * Test save_provider_ajax method with redirect URI.
+	 */
+	public function test_save_provider_ajax_with_redirect_uri(): void {
+		$_POST = [
+			'provider_name' => 'test-provider',
+			'display_name' => 'Test Provider',
+			'authorization_url' => 'https://example.com/auth',
+			'token_url' => 'https://example.com/token',
+			'user_info_url' => 'https://example.com/user',
+			'client_id' => 'test-client-id',
+			'client_secret' => 'test-client-secret',
+			'redirect_uri' => 'https://example.com/custom-callback',
+			'default_scopes' => 'email profile',
+			'supports_one_tap' => '1',
+		];
+
+		WP_Mock::userFunction( 'check_ajax_referer' );
+		WP_Mock::userFunction( 'current_user_can', [ 'return' => true ] );
+		WP_Mock::userFunction( 'sanitize_text_field' );
+		WP_Mock::userFunction( 'esc_url_raw' );
+		WP_Mock::userFunction( 'wp_send_json_success' );
+
+		$this->settings->save_provider_ajax();
+		
+		// Method should execute without errors
+		$this->assertTrue( true );
+	}
+
+	/**
+	 * Test save_provider_ajax method with default redirect URI.
+	 */
+	public function test_save_provider_ajax_with_default_redirect_uri(): void {
+		$_POST = [
+			'provider_name' => 'test-provider',
+			'display_name' => 'Test Provider',
+			'authorization_url' => 'https://example.com/auth',
+			'token_url' => 'https://example.com/token',
+			'user_info_url' => 'https://example.com/user',
+			'client_id' => 'test-client-id',
+			'client_secret' => 'test-client-secret',
+			// redirect_uri not provided, should default to wp_login_url()
+			'default_scopes' => 'email profile',
+			'supports_one_tap' => '1',
+		];
+
+		WP_Mock::userFunction( 'check_ajax_referer' );
+		WP_Mock::userFunction( 'current_user_can', [ 'return' => true ] );
+		WP_Mock::userFunction( 'sanitize_text_field' );
+		WP_Mock::userFunction( 'esc_url_raw' );
+		WP_Mock::userFunction( 'wp_login_url', [ 'return' => 'https://example.com/wp-login.php' ] );
+		WP_Mock::userFunction( 'wp_send_json_success' );
+
+		$this->settings->save_provider_ajax();
+		
+		// Method should execute without errors
+		$this->assertTrue( true );
+	}
+
+	/**
 	 * Test delete_provider_ajax method.
 	 */
 	public function test_delete_provider_ajax(): void {
@@ -328,6 +390,50 @@ class SettingsTest extends TestCase {
 	public function test_handle_migration(): void {
 		// Just test that the method executes without errors
 		$this->settings->handle_migration();
+		
+		// Method should execute without errors
+		$this->assertTrue( true );
+	}
+
+	/**
+	 * Test get_provider_ajax method.
+	 */
+	public function test_get_provider_ajax(): void {
+		$_POST = [
+			'provider' => 'test-provider',
+		];
+
+		$test_config = [
+			'name' => 'test-provider',
+			'display_name' => 'Test Provider',
+			'authorization_url' => 'https://example.com/auth',
+			'token_url' => 'https://example.com/token',
+			'user_info_url' => 'https://example.com/user',
+			'client_id' => 'test-client-id',
+			'client_secret' => 'test-client-secret',
+			'redirect_uri' => 'https://example.com/callback',
+			'default_scopes' => 'email profile',
+			'supports_one_tap' => true,
+			'certs_url' => 'https://example.com/certs',
+			'valid_issuers' => ['https://example.com'],
+		];
+
+		// Update the mock to return the test config
+		$provider_manager = Mockery::mock( 'ProviderManager' );
+		$provider_manager->shouldReceive( 'get_provider_config' )->with( 'sanitized_text' )->andReturn( $test_config );
+
+		// Update the settings instance with the new mock
+		$settings = new \ReflectionClass( Settings::class );
+		$property = $settings->getProperty( 'provider_manager' );
+		$property->setAccessible( true );
+		$property->setValue( $this->settings, $provider_manager );
+
+		WP_Mock::userFunction( 'check_ajax_referer' );
+		WP_Mock::userFunction( 'current_user_can', [ 'return' => true ] );
+		WP_Mock::userFunction( 'sanitize_text_field', [ 'return' => 'sanitized_text' ] );
+		WP_Mock::userFunction( 'wp_send_json_success' );
+
+		$this->settings->get_provider_ajax();
 		
 		// Method should execute without errors
 		$this->assertTrue( true );

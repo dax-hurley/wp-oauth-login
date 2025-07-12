@@ -10,15 +10,18 @@
 		"watch": "concurrently \"mix watch\" \"wp-scripts start --source-path=./assets/src/blocks --output-path=./assets/build/blocks\"",
 		"lint:js": "wp-scripts lint-js ./src/blocks",
 		"lint:style": "wp-scripts lint-style ./src/blocks",
-		"lint:js:fix": "npm run lint:js -- --fix ./src/blocks"
+		"lint:js:fix": "npm run lint:js -- --fix ./src/blocks",
+		"build-plugin": "./build-plugin.sh",
+		"build-plugin-js": "node build-plugin.js"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^30.16.0",
+		"archiver": "^7.0.1",
+		"concurrently": "^9.1.2",
 		"cross-env": "^7.0.3",
 		"laravel-mix": "^6.0.49",
 		"lodash": "^4.17.21",
 		"sass": "^1.87.0",
-		"sass-loader": "^16.0.5",
-		"concurrently": "^9.1.2"
+		"sass-loader": "^16.0.5"
 	}
 }

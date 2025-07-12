@@ -102,6 +102,16 @@
     margin-right: 5px;
 }
 
+.edit-provider {
+    color: #0073aa;
+    border-color: #0073aa;
+}
+
+.edit-provider:hover {
+    background: #0073aa;
+    color: #fff;
+}
+
 .delete-provider {
     color: #dc3232;
     border-color: #dc3232;
@@ -110,6 +120,16 @@
 .delete-provider:hover {
     background: #dc3232;
     color: #fff;
+}
+
+/* Form edit mode indicator */
+.oauth-provider-form.edit-mode {
+    border-color: #0073aa;
+    background: #f0f8ff;
+}
+
+.oauth-provider-form.edit-mode h3 {
+    color: #0073aa;
 }
 
 /* Responsive design */

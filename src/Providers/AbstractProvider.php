@@ -282,7 +282,7 @@ abstract class AbstractProvider implements ProviderInterface {
 		);
 
 		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the access token, please try again.', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Could not retrieve the access token, please try again.', 'wp-oauth-login' ) );
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
@@ -306,7 +306,7 @@ abstract class AbstractProvider implements ProviderInterface {
 		);
 
 		if ( 200 !== wp_remote_retrieve_response_code( $user ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the user information, please try again.', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Could not retrieve the user information, please try again.', 'wp-oauth-login' ) );
 		}
 
 		return json_decode( wp_remote_retrieve_body( $user ) );
@@ -320,17 +320,17 @@ abstract class AbstractProvider implements ProviderInterface {
 	public function get_settings_fields(): array {
 		return [
 			'client_id'     => [
-				'label'       => __( 'Client ID', 'login-with-oauth' ),
+				'label'       => __( 'Client ID', 'wp-oauth-login' ),
 				'type'        => 'text',
 				'description' => sprintf(
 					/* translators: %1$s: Provider name, %2$s: Documentation URL */
-					__( 'Create OAuth Client ID for %1$s at %2$s', 'login-with-oauth' ),
+					__( 'Create OAuth Client ID for %1$s at %2$s', 'wp-oauth-login' ),
 					$this->get_display_name(),
 					$this->get_documentation_url()
 				),
 			],
 			'client_secret' => [
-				'label'       => __( 'Client Secret', 'login-with-oauth' ),
+				'label'       => __( 'Client Secret', 'wp-oauth-login' ),
 				'type'        => 'password',
 				'description' => '',
 			],

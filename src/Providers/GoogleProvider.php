@@ -28,7 +28,7 @@ class GoogleProvider extends AbstractProvider {
 		parent::__construct( $config );
 		
 		$this->name         = $config['name'] ?? 'google';
-		$this->display_name = $config['display_name'] ?? __( 'Google', 'login-with-oauth' );
+		$this->display_name = $config['display_name'] ?? __( 'Google', 'wp-oauth-login' );
 		$this->authorization_url = 'https://accounts.google.com/o/oauth2/auth';
 		$this->token_url    = 'https://oauth2.googleapis.com/token';
 		$this->user_info_url = 'https://www.googleapis.com/oauth2/v2/userinfo';
@@ -55,40 +55,40 @@ class GoogleProvider extends AbstractProvider {
 	public function get_settings_fields(): array {
 		return [
 			'name' => [
-				'label'       => __( 'Provider Name', 'login-with-oauth' ),
+				'label'       => __( 'Provider Name', 'wp-oauth-login' ),
 				'type'        => 'text',
-				'description' => __( 'A unique name for this provider (e.g., "google")', 'login-with-oauth' ),
+				'description' => __( 'A unique name for this provider (e.g., "google")', 'wp-oauth-login' ),
 				'required'    => true,
 				'default'     => 'google',
 			],
 			'display_name' => [
-				'label'       => __( 'Display Name', 'login-with-oauth' ),
+				'label'       => __( 'Display Name', 'wp-oauth-login' ),
 				'type'        => 'text',
-				'description' => __( 'The name shown to users', 'login-with-oauth' ),
+				'description' => __( 'The name shown to users', 'wp-oauth-login' ),
 				'required'    => true,
 				'default'     => 'Google',
 			],
 			'client_id' => [
-				'label'       => __( 'Client ID', 'login-with-oauth' ),
+				'label'       => __( 'Client ID', 'wp-oauth-login' ),
 				'type'        => 'text',
 				'description' => sprintf(
 					/* translators: %1$s: Provider name, %2$s: Documentation URL */
-					__( 'Create OAuth Client ID for %1$s at %2$s', 'login-with-oauth' ),
+					__( 'Create OAuth Client ID for %1$s at %2$s', 'wp-oauth-login' ),
 					$this->get_display_name(),
 					$this->get_documentation_url()
 				),
 				'required'    => true,
 			],
 			'client_secret' => [
-				'label'       => __( 'Client Secret', 'login-with-oauth' ),
+				'label'       => __( 'Client Secret', 'wp-oauth-login' ),
 				'type'        => 'password',
-				'description' => __( 'The OAuth 2.0 client secret from Google', 'login-with-oauth' ),
+				'description' => __( 'The OAuth 2.0 client secret from Google', 'wp-oauth-login' ),
 				'required'    => true,
 			],
 			'default_scopes' => [
-				'label'       => __( 'Default Scopes', 'login-with-oauth' ),
+				'label'       => __( 'Default Scopes', 'wp-oauth-login' ),
 				'type'        => 'text',
-				'description' => __( 'Space-separated list of OAuth scopes (e.g., "email profile openid")', 'login-with-oauth' ),
+				'description' => __( 'Space-separated list of OAuth scopes (e.g., "email profile openid")', 'wp-oauth-login' ),
 				'default'     => 'email profile openid',
 			],
 		];

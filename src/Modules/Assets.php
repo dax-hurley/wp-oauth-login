@@ -107,7 +107,7 @@ class Assets implements ModuleInterface {
 	 */
 	public function enqueue_admin_styles( string $hook_suffix ): void {
 		// Only enqueue on our settings page
-		if ( 'settings_page_login-with-oauth' !== $hook_suffix ) {
+		if ( 'settings_page_wp-oauth-login' !== $hook_suffix ) {
 			return;
 		}
 

@@ -39,6 +39,7 @@ This is a fork of [login with google](https://github.com/rtCamp/login-with-googl
    - **User Info URL**: The user info endpoint (e.g., `https://api.provider.com/user`)
    - **Client ID**: Your OAuth client ID
    - **Client Secret**: Your OAuth client secret
+   - **Redirect URI**: The redirect URI for your OAuth application (defaults to your WordPress login page)
    - **Default Scopes**: Space-separated list of OAuth scopes
    - **Supports One-Tap Login**: Check if provider supports one-tap login
    - **Certificates URL**: URL for JWT certificate verification (optional)
@@ -57,6 +58,7 @@ Token URL: https://github.com/login/oauth/access_token
 User Info URL: https://api.github.com/user
 Client ID: [Your GitHub OAuth App Client ID]
 Client Secret: [Your GitHub OAuth App Client Secret]
+Redirect URI: https://yourdomain.com/wp-login.php
 Default Scopes: user:email read:user
 Supports One-Tap Login: [Leave unchecked]
 ```
@@ -70,6 +72,7 @@ Token URL: https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token
 User Info URL: https://graph.microsoft.com/v1.0/me
 Client ID: [Your Azure App Registration Client ID]
 Client Secret: [Your Azure App Registration Client Secret]
+Redirect URI: https://yourdomain.com/wp-login.php
 Default Scopes: openid profile email
 Supports One-Tap Login: [Leave unchecked]
 Certificates URL: https://login.microsoftonline.com/{tenant-id}/discovery/v2.0/keys
@@ -85,6 +88,7 @@ Token URL: https://auth.mycompany.com/oauth/token
 User Info URL: https://api.mycompany.com/user
 Client ID: [Your Client ID]
 Client Secret: [Your Client Secret]
+Redirect URI: https://yourdomain.com/wp-login.php
 Default Scopes: email profile
 Supports One-Tap Login: [Leave unchecked]
 Certificates URL: https://auth.mycompany.com/.well-known/jwks.json
@@ -188,6 +192,18 @@ This plugin implements the OAuth 2.0 Authorization Code flow as specified in [RF
 - **PKCE Support**: Can be extended to support PKCE for additional security
 - **JWT Verification**: Supports ID token verification with provider-specific certificates
 
+## Redirect URI Configuration
+
+The plugin allows you to configure a custom redirect URI for each OAuth provider. By default, it uses your WordPress login page (`wp-login.php`), but you can specify a different URL if needed.
+
+**Default Redirect URI**: `https://yourdomain.com/wp-login.php`
+
+**Custom Redirect URI**: You can set a custom redirect URI in the provider configuration form. This is useful if you need to use a different callback URL for specific OAuth providers.
+
+**Important**: When configuring your OAuth application with your provider, make sure to set the redirect URI to match what you've configured in the plugin settings.
+
+The plugin handles the OAuth callback at the configured URL and processes the authorization code to complete the login flow.
+
 ## Security Features
 
 - **State Parameter**: CSRF protection using state parameter
@@ -222,6 +238,34 @@ This plugin implements the OAuth 2.0 Authorization Code flow as specified in [RF
 - WordPress 5.5+
 - PHP 7.4+
 - OAuth 2.0 provider with standard endpoints
+
+## Troubleshooting
+
+### "The 'redirect_uri' parameter is required" Error
+
+If you encounter this error when trying to authenticate with your OAuth provider:
+
+1. **Check Provider Configuration**: Ensure your OAuth provider is properly configured in the WordPress admin
+2. **Verify Redirect URI**: Make sure your OAuth application's redirect URI is set to `https://yourdomain.com/wp-login.php`
+3. **Clear Cache**: Clear any caching plugins or server-side cache
+4. **Check Plugin Version**: Ensure you're using version 1.4.0 or later
+
+### Common OAuth Configuration Issues
+
+- **Invalid Client ID/Secret**: Double-check your OAuth application credentials
+- **Wrong Authorization URL**: Verify the authorization endpoint URL is correct
+- **Missing Scopes**: Ensure required scopes (like `email`, `profile`) are configured
+- **HTTPS Required**: Most OAuth providers require HTTPS for production use
+
+### Debug Mode
+
+Enable WordPress debug mode to see detailed error messages:
+
+```php
+// In wp-config.php
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+```
 
 ## Support
 

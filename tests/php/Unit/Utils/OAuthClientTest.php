@@ -227,4 +227,33 @@ class OAuthClientTest extends TestCase {
 	public function testGetProvider() {
 		$this->assertSame( $this->providerMock, $this->testee->get_provider() );
 	}
+
+	/**
+	 * Test that the provider's redirect URI is set and returned correctly.
+	 */
+	public function testProviderRedirectUriIsSetAndReturned() {
+		$redirect_uri = 'https://example.com/wp-login.php';
+		$this->providerMock->expects($this->once())
+			->method('get_redirect_uri')
+			->willReturn($redirect_uri);
+
+		// The gt_redirect_url method should return the provider's redirect URI
+		\WP_Mock::onFilter('daxhurley.oauth_redirect_url')->with($redirect_uri)->reply($redirect_uri);
+		$this->assertSame($redirect_uri, $this->testee->gt_redirect_url());
+	}
+
+	/**
+	 * Test that the authorization URL includes the correct redirect_uri parameter.
+	 */
+	public function testAuthorizationUrlIncludesRedirectUri() {
+		$redirect_uri = 'https://example.com/wp-login.php';
+		$expected_url = 'https://accounts.oauth.com/o/oauth2/auth?client_id=cid&redirect_uri=' . urlencode($redirect_uri) . '&state=abcd&scope=email+profile+openid&access_type=online&response_type=code';
+
+		$this->providerMock->expects($this->once())
+			->method('get_authorization_url_with_params')
+			->willReturn($expected_url);
+
+		$url = $this->testee->authorization_url();
+		$this->assertStringContainsString('redirect_uri=' . urlencode($redirect_uri), $url);
+	}
 }

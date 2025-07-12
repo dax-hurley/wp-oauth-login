@@ -61,7 +61,13 @@ class ProviderManager {
 	private function register_default_providers(): void {
 		// Register configured providers
 		foreach ( $this->configurations as $provider_name => $config ) {
-			$this->register_provider( $provider_name, new GenericProvider( $config ) );
+			$provider = new GenericProvider( $config );
+			
+			// Use custom redirect URI if provided, otherwise default to WordPress login page
+			$redirect_uri = ! empty( $config['redirect_uri'] ) ? $config['redirect_uri'] : wp_login_url();
+			$provider->set_redirect_uri( $redirect_uri );
+			
+			$this->register_provider( $provider_name, $provider );
 		}
 
 		/**
@@ -80,6 +86,11 @@ class ProviderManager {
 	 * @return void
 	 */
 	public function register_provider( string $provider_name, ProviderInterface $provider ): void {
+		// Ensure the provider has a redirect URI set
+		if ( empty( $provider->get_redirect_uri() ) ) {
+			$provider->set_redirect_uri( wp_login_url() );
+		}
+		
 		$this->providers[ $provider_name ] = $provider;
 	}
 
@@ -185,6 +196,11 @@ class ProviderManager {
 	 */
 	public function validate_provider_config( string $provider_name, array $config ): bool {
 		$provider = new GenericProvider( $config );
+		
+		// Use custom redirect URI if provided, otherwise default to WordPress login page
+		$redirect_uri = ! empty( $config['redirect_uri'] ) ? $config['redirect_uri'] : wp_login_url();
+		$provider->set_redirect_uri( $redirect_uri );
+		
 		return $provider->validate_config();
 	}
 

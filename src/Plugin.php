@@ -120,7 +120,7 @@ class Plugin {
 	 * @return void
 	 */
 	public function load_translations(): void {
-		load_plugin_textdomain( 'wp-oauth-login', false, basename( plugin()->path ) . '/languages/' . get_locale() );
+		load_plugin_textdomain( 'wp-oauth-login', false, basename( $this->path ) . '/languages' );
 	}
 
 	/**

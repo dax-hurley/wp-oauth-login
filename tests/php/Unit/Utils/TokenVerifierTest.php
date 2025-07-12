@@ -113,6 +113,13 @@ class TokenVerifierTest extends TestCase {
 			]
 		);
 
+		\WP_Mock::userFunction(
+			'wp_login_url',
+			[
+				'return' => 'http://example.test/wp-login.php',
+			]
+		);
+
 		// Mock the global plugin function
 		$pluginMock = Mockery::mock( Plugin::class );
 		$containerMock = Mockery::mock( Container::class );

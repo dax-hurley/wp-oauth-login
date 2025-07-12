@@ -98,7 +98,7 @@ class Shortcode implements ModuleInterface {
 		$redirect_to = Helper::get_redirect_url();
 		$attrs       = shortcode_atts(
 			[
-				'button_text'   => __( 'Login with OAuth', 'login-with-oauth' ),
+				'button_text'   => __( 'Login with OAuth', 'wp-oauth-login' ),
 				'force_display' => 'no',
 				'redirect_to'   => $redirect_to,
 				'provider'      => '',

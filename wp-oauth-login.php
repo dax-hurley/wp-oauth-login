@@ -38,15 +38,13 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 			$hook,
 			function () {
 				$message = __(
-					'WP OAuth Login Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version',
-					'wp-oauth-login'
+					'WP OAuth Login Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version'
 				);
 
 				printf(
 					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
 					esc_html__(
-						'The plugin WP OAuth Login has been deactivated',
-						'wp-oauth-login'
+						'The plugin WP OAuth Login has been deactivated'
 					),
 					wp_kses( $message, [ 'br' => true ] )
 				);

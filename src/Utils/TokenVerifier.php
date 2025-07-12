@@ -250,14 +250,14 @@ class TokenVerifier {
 		$token_parts = explode( '.', $this->token );
 
 		if ( 3 !== count( $token_parts ) ) {
-			throw new Exception( esc_html__( 'ID token is not a valid JWT token', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'ID token is not a valid JWT token', 'wp-oauth-login' ) );
 		}
 
 		$header  = json_decode( $this->base64_decode_url( $token_parts[0] ) );
 		$payload = json_decode( $this->base64_decode_url( $token_parts[1] ) );
 
 		if ( ! $header || ! $payload ) {
-			throw new Exception( esc_html__( 'ID token is not a valid JWT token', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'ID token is not a valid JWT token', 'wp-oauth-login' ) );
 		}
 
 		$this->current_user = $payload;
@@ -280,13 +280,13 @@ class TokenVerifier {
 		$header      = json_decode( $this->base64_decode_url( $token_parts[0] ) );
 
 		if ( ! property_exists( $header, 'kid' ) ) {
-			throw new Exception( esc_html__( 'Key ID not found in token header', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Key ID not found in token header', 'wp-oauth-login' ) );
 		}
 
 		$public_key = $this->get_public_key( $header->kid );
 
 		if ( ! $public_key ) {
-			throw new Exception( esc_html__( 'Public key not found for the given key ID', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Public key not found for the given key ID', 'wp-oauth-login' ) );
 		}
 
 		$signature = $this->base64_decode_url( $token_parts[2] );
@@ -296,7 +296,7 @@ class TokenVerifier {
 		$verified = openssl_verify( $data, $signature, $public_key, $algo );
 
 		if ( 1 !== $verified ) {
-			throw new Exception( esc_html__( 'Token signature verification failed', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Token signature verification failed', 'wp-oauth-login' ) );
 		}
 	}
 
@@ -308,31 +308,31 @@ class TokenVerifier {
 	 */
 	private function valid_data(): void {
 		if ( ! property_exists( $this->current_user, 'iss' ) ) {
-			throw new Exception( esc_html__( 'Issuer not found in token', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Issuer not found in token', 'wp-oauth-login' ) );
 		}
 
 		if ( ! property_exists( $this->current_user, 'aud' ) ) {
-			throw new Exception( esc_html__( 'Audience not found in token', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Audience not found in token', 'wp-oauth-login' ) );
 		}
 
 		if ( ! property_exists( $this->current_user, 'exp' ) ) {
-			throw new Exception( esc_html__( 'Expiration time not found in token', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Expiration time not found in token', 'wp-oauth-login' ) );
 		}
 
 		// Check if token is expired
 		if ( time() > $this->current_user->exp ) {
-			throw new Exception( esc_html__( 'Token has expired', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Token has expired', 'wp-oauth-login' ) );
 		}
 
 		// Check issuer based on provider configuration
 		$valid_issuers = $this->get_valid_issuers();
 		if ( ! in_array( $this->current_user->iss, $valid_issuers, true ) ) {
-			throw new Exception( esc_html__( 'Invalid token issuer', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Invalid token issuer', 'wp-oauth-login' ) );
 		}
 
 		// Check audience (should match client ID)
 		if ( $this->current_provider && $this->current_user->aud !== $this->current_provider->get_client_id() ) {
-			throw new Exception( esc_html__( 'Token audience does not match client ID', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Token audience does not match client ID', 'wp-oauth-login' ) );
 		}
 	}
 

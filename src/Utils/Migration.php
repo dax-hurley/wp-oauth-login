@@ -83,9 +83,9 @@ class Migration {
 	 */
 	public static function get_migration_notice(): string {
 		$notice = '<div class="notice notice-warning is-dismissible">';
-		$notice .= '<p><strong>' . __( 'WP OAuth Login Update Required', 'login-with-oauth' ) . '</strong></p>';
-		$notice .= '<p>' . __( 'Your OAuth configuration needs to be migrated to the new provider system. This will preserve your existing Google OAuth settings.', 'login-with-oauth' ) . '</p>';
-		$notice .= '<p><a href="' . admin_url( 'options-general.php?page=login-with-oauth&migrate=1' ) . '" class="button button-primary">' . __( 'Migrate Now', 'login-with-oauth' ) . '</a></p>';
+		$notice .= '<p><strong>' . __( 'WP OAuth Login Update Required', 'wp-oauth-login' ) . '</strong></p>';
+		$notice .= '<p>' . __( 'Your existing Google OAuth settings have been preserved.', 'wp-oauth-login' ) . '</p>';
+		$notice .= '<p><a href="' . admin_url( 'options-general.php?page=wp-oauth-login&migrate=1' ) . '" class="button button-primary">' . __( 'Migrate Now', 'wp-oauth-login' ) . '</a></p>';
 		$notice .= '</div>';
 		
 		return $notice;

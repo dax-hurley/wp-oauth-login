@@ -307,30 +307,15 @@ class PluginTest extends TestCase {
 		$this->containerMock->expects( $this->never() )
 		                    ->method( 'define_services' );
 
-		$this->wpMockFunction(
-			'get_locale',
-			[],
-			1,
-			'en_US'
-		);
-
-		$this->wpMockFunction(
-			'DaxHurley\OAuthLogin\plugin',
-			[],
-			1,
-			function () {
-				return (object) [
-					'path' => '/some/utterly/fake/path-to-test/',
-				];
-			}
-		);
+		// Set up the path property that load_translations depends on
+		$this->testee->path = '/some/utterly/fake/path-to-test/';
 
 		$this->wpMockFunction(
 			'load_plugin_textdomain',
 			[
 				'wp-oauth-login',
 				false,
-				'path-to-test/languages/en_US'
+				'path-to-test/languages'
 			]
 		);
 

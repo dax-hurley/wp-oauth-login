@@ -64,7 +64,7 @@ class Container implements ContainerInterface {
 		if ( ! in_array( $service, $this->container->keys(), true ) ) {
 			$error_message = sprintf(
 				/* translators: %$s is replaced with requested service name. */
-				__( 'Invalid Service %s Passed to the container', 'login-with-oauth' ),
+				__( 'Invalid Service %s Passed to the container' ),
 				$service
 			);
 
@@ -129,13 +129,16 @@ class Container implements ContainerInterface {
 				// Create a dummy provider for backward compatibility
 				$first_provider = new \DaxHurley\OAuthLogin\Providers\GenericProvider( [
 					'name' => 'default',
-					'display_name' => __( 'Default Provider', 'login-with-oauth' ),
+					'display_name' => __( 'Default Provider' ),
 					'authorization_url' => '',
 					'token_url' => '',
 					'user_info_url' => '',
 					'client_id' => '',
 					'client_secret' => '',
 				] );
+				
+				// Set the redirect URI for the fallback provider
+				$first_provider->set_redirect_uri( wp_login_url() );
 			}
 
 			return new OAuthClient( $first_provider );

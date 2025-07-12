@@ -19,6 +19,7 @@ use DaxHurley\OAuthLogin\Utils\Authenticator;
 use DaxHurley\OAuthLogin\Utils\ProviderManager;
 use DaxHurley\OAuthLogin\Utils\TokenVerifier;
 use Exception;
+use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class OneTapLogin.
@@ -167,7 +168,7 @@ class OneTapLogin implements ModuleInterface {
 		$script_url = $one_tap_config['script_url'] ?? 'https://accounts.google.com/gsi/client';
 
 		wp_enqueue_script(
-			'login-with-oauth-one-tap',
+			'wp-oauth-login-one-tap',
 			$script_url,
 			[],
 			filemtime( trailingslashit( plugin()->path ) . 'assets/build/js/onetap.js' ),
@@ -184,7 +185,7 @@ class OneTapLogin implements ModuleInterface {
 		Helper::remove_redirect_state_filter();
 
 		wp_register_script(
-			'login-with-oauth-one-tap-js',
+			'wp-oauth-login-one-tap-js',
 			trailingslashit( plugin()->url ) . 'assets/build/js/' . $filename,
 			[
 				'wp-i18n',
@@ -194,17 +195,17 @@ class OneTapLogin implements ModuleInterface {
 		);
 
 		wp_add_inline_script(
-			'login-with-oauth-one-tap-js',
+			'wp-oauth-login-one-tap-js',
 			'var TempAccessOneTap=' . json_encode( $data ), //phpcs:disable WordPress.WP.AlternativeFunctions.json_encode_json_encode
 			'before'
 		);
 
-		wp_enqueue_script( 'login-with-oauth-one-tap-js' );
+		wp_enqueue_script( 'wp-oauth-login-one-tap-js' );
 
 		// @see https://make.wordpress.org/core/2018/11/09/new-javascript-i18n-support-in-wordpress/
 		// @see https://developer.wordpress.org/reference/functions/wp_set_script_translations/
 		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( 'login-with-oauth-one-tap-js', 'login-with-oauth' );
+			wp_set_script_translations( 'wp-oauth-login-one-tap-js', 'wp-oauth-login' );
 		}
 	}
 
@@ -274,7 +275,7 @@ class OneTapLogin implements ModuleInterface {
 			$verified = $this->token_verifier->verify_token( $token, $provider );
 
 			if ( ! $verified ) {
-				throw new Exception( __( 'Cannot verify the credentials', 'login-with-oauth' ) );
+				throw new Exception( __( 'Cannot verify the credentials', 'wp-oauth-login' ) );
 			}
 
 			/**
