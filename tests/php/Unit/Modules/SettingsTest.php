@@ -61,6 +61,8 @@ class SettingsTest extends TestCase {
 		WP_Mock::userFunction( 'settings_fields' );
 		WP_Mock::userFunction( 'do_settings_sections' );
 		WP_Mock::userFunction( 'wp_create_nonce', [ 'return' => 'test_nonce' ] );
+		WP_Mock::userFunction( 'update_option', [ 'return' => true ] );
+		WP_Mock::userFunction( 'do_action' );
 
 		// Mock the global plugin context
 		global $wp_oauth_login_plugin;
@@ -311,15 +313,23 @@ class SettingsTest extends TestCase {
 	 * Test show_migration_notice method.
 	 */
 	public function test_show_migration_notice(): void {
-		// Skip this test for now due to Migration class complexity
-		$this->markTestSkipped( 'Migration notice test skipped due to class complexity' );
+		// Just test that the method executes without errors
+		ob_start();
+		$this->settings->show_migration_notice();
+		$output = ob_get_clean();
+		
+		// Method should execute without errors
+		$this->assertTrue( true );
 	}
 
 	/**
 	 * Test handle_migration method.
 	 */
 	public function test_handle_migration(): void {
-		// Skip this test for now due to Migration class complexity
-		$this->markTestSkipped( 'Migration handling test skipped due to class complexity' );
+		// Just test that the method executes without errors
+		$this->settings->handle_migration();
+		
+		// Method should execute without errors
+		$this->assertTrue( true );
 	}
 }

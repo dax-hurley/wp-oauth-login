@@ -4,6 +4,7 @@
 		"build-blocks-manifest": "wp-scripts build-blocks-manifest --input=./assets/src/blocks --output=./assets/build/blocks/blocks-manifest.php",
 		"development": "mix && cross-env NODE_ENV=development wp-scripts build --source-path=./assets/src/blocks --output-path=./assets/build/blocks",
 		"postdevelopment": "npm run build-blocks-manifest",
+		"test": "./vendor/bin/phpunit",
 		"production": "mix --production && wp-scripts build --source-path=./assets/src/blocks --output-path=./assets/build/blocks",
 		"postproduction": "npm run build-blocks-manifest",
 		"watch": "concurrently \"mix watch\" \"wp-scripts start --source-path=./assets/src/blocks --output-path=./assets/build/blocks\"",
