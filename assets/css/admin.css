@@ -1,0 +1,142 @@
+/* WP OAuth Login Admin Styles */
+
+.oauth-providers-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.oauth-providers-section h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.oauth-providers-list {
+    margin-bottom: 30px;
+}
+
+.oauth-providers-list table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.oauth-providers-list th {
+    text-align: left;
+    padding: 12px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e1e1e1;
+    font-weight: 600;
+}
+
+.oauth-providers-list td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.oauth-providers-list tr:hover {
+    background: #f9f9f9;
+}
+
+.status-ok {
+    color: #46b450;
+    font-weight: 600;
+}
+
+.status-error {
+    color: #dc3232;
+    font-weight: 600;
+}
+
+.oauth-provider-form {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 4px;
+    border: 1px solid #e1e1e1;
+}
+
+.oauth-provider-form h3 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.oauth-provider-form .form-table th {
+    width: 200px;
+    padding: 15px 10px 15px 0;
+}
+
+.oauth-provider-form .form-table td {
+    padding: 15px 10px;
+}
+
+.oauth-provider-form input[type="text"],
+.oauth-provider-form input[type="url"],
+.oauth-provider-form input[type="password"] {
+    width: 100%;
+    max-width: 400px;
+}
+
+.oauth-provider-form .description {
+    margin-top: 5px;
+    color: #666;
+    font-style: italic;
+}
+
+.oauth-general-settings {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.oauth-general-settings h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+/* Button styles */
+.edit-provider,
+.delete-provider {
+    margin-right: 5px;
+}
+
+.delete-provider {
+    color: #dc3232;
+    border-color: #dc3232;
+}
+
+.delete-provider:hover {
+    background: #dc3232;
+    color: #fff;
+}
+
+/* Responsive design */
+@media (max-width: 782px) {
+    .oauth-providers-list table {
+        font-size: 14px;
+    }
+    
+    .oauth-providers-list th,
+    .oauth-providers-list td {
+        padding: 8px;
+    }
+    
+    .oauth-provider-form .form-table th {
+        width: 100%;
+        display: block;
+        padding-bottom: 5px;
+    }
+    
+    .oauth-provider-form .form-table td {
+        display: block;
+        padding-top: 5px;
+    }
+    
+    .oauth-provider-form input[type="text"],
+    .oauth-provider-form input[type="url"],
+    .oauth-provider-form input[type="password"] {
+        max-width: 100%;
+    }
+} 

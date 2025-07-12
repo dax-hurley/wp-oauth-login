@@ -1,11 +1,11 @@
 <?php
 /**
- * JWT Token Verifier.
+ * Token Verifier.
  *
- * This will verify the token based on asymmetric encryption.
+ * Useful in verifying JWT Auth token.
  *
  * @package DaxHurley\OAuthLogin
- * @since 1.0.16
+ * @since 1.0.0
  */
 
 declare(strict_types=1);
@@ -15,6 +15,7 @@ namespace DaxHurley\OAuthLogin\Utils;
 use Requests_Utility_CaseInsensitiveDictionary;
 use Exception;
 use DaxHurley\OAuthLogin\Modules\Settings;
+use DaxHurley\OAuthLogin\Interfaces\Provider as ProviderInterface;
 use stdClass;
 
 /**
@@ -24,9 +25,9 @@ use stdClass;
  */
 class TokenVerifier {
 	/**
-	 * Get list of public keys to verify signature.
+	 * Default certificates URL for Google (fallback).
 	 */
-	const CERTS_URL = 'https://www.oauthapis.com/oauth2/v1/certs';
+	const DEFAULT_CERTS_URL = 'https://www.googleapis.com/oauth2/v1/certs';
 
 	/**
 	 * List of supported algorithms.
@@ -61,12 +62,27 @@ class TokenVerifier {
 	private $settings;
 
 	/**
+	 * Provider manager instance.
+	 *
+	 * @var ProviderManager
+	 */
+	private $provider_manager;
+
+	/**
+	 * Current provider for token verification.
+	 *
+	 * @var ProviderInterface|null
+	 */
+	private $current_provider;
+
+	/**
 	 * TokenVerifier constructor.
 	 *
 	 * @param Settings $settings Settings instance.
 	 */
 	public function __construct( Settings $settings ) {
 		$this->settings = $settings;
+		$this->provider_manager = new ProviderManager();
 	}
 
 	/**
@@ -88,12 +104,20 @@ class TokenVerifier {
 	 * Verify if a token is valid or not.
 	 *
 	 * @param string $token Received ID token from OAuth.
+	 * @param string|null $provider_name Provider name for token verification.
 	 *
 	 * @return bool
 	 * @throws Exception Token verification failure exception.
 	 */
-	public function verify_token( string $token ): bool {
+	public function verify_token( string $token, ?string $provider_name = null ): bool {
 		$this->token = $token;
+
+		// Get the provider for verification
+		if ( $provider_name ) {
+			$this->current_provider = $this->provider_manager->get_provider( $provider_name );
+		} else {
+			$this->current_provider = $this->provider_manager->get_first_configured_provider();
+		}
 
 		try {
 			$this->is_valid_jwt();
@@ -144,6 +168,29 @@ class TokenVerifier {
 	}
 
 	/**
+	 * Get the certificates URL for the current provider.
+	 *
+	 * @return string
+	 */
+	private function get_certs_url(): string {
+		if ( $this->current_provider ) {
+			// Allow providers to specify their own certificates URL
+			$config = $this->current_provider->get_config();
+			if ( ! empty( $config['certs_url'] ) ) {
+				return $config['certs_url'];
+			}
+
+			// For Google provider, use the default URL
+			if ( $this->current_provider->get_name() === 'google' ) {
+				return self::DEFAULT_CERTS_URL;
+			}
+		}
+
+		// Fallback to default
+		return self::DEFAULT_CERTS_URL;
+	}
+
+	/**
 	 * Get public key based on key ID.
 	 *
 	 * @param string|null $key_id Key ID.
@@ -163,7 +210,7 @@ class TokenVerifier {
 		}
 
 		//phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get
-		$certs = wp_remote_get( self::CERTS_URL );
+		$certs = wp_remote_get( $this->get_certs_url() );
 
 		if ( 200 !== wp_remote_retrieve_response_code( $certs ) ) {
 			return null;
@@ -200,120 +247,145 @@ class TokenVerifier {
 	 * @throws Exception ID token invalid.
 	 */
 	private function is_valid_jwt(): ?array {
-		$parts = explode( '.', $this->token );
+		$token_parts = explode( '.', $this->token );
 
-		if ( ! is_array( $parts ) || 3 !== count( $parts ) ) {
-			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-oauth' ) );
+		if ( 3 !== count( $token_parts ) ) {
+			throw new Exception( esc_html__( 'ID token is not a valid JWT token', 'login-with-oauth' ) );
 		}
 
-		list( $header, $payload, $obtained_signature ) = $parts;
-		$header                                        = $this->base64_decode_url( $header );
-		$payload                                       = $this->base64_decode_url( $payload );
+		$header  = json_decode( $this->base64_decode_url( $token_parts[0] ) );
+		$payload = json_decode( $this->base64_decode_url( $token_parts[1] ) );
 
 		if ( ! $header || ! $payload ) {
-			throw new Exception( esc_html__( 'ID token is invalid', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'ID token is not a valid JWT token', 'login-with-oauth' ) );
 		}
 
+		$this->current_user = $payload;
+
 		return [
-			$header,
-			$payload,
-			$obtained_signature,
+			'header'  => $header,
+			'payload' => $payload,
+			'signature' => $token_parts[2],
 		];
 	}
 
 	/**
-	 * Verifies the signature in token.
+	 * Verify the signature of the token.
 	 *
 	 * @return void
-	 * @throws Exception Failed signature verification.
+	 * @throws Exception Signature verification failure.
 	 */
 	private function is_valid_signature(): void {
-		list( $header, $payload, $obtained_signature ) = $this->is_valid_jwt();
-		$parsed_header                                 = json_decode( $header );
-		$parsed_header                                 = wp_parse_args(
-			(array) $parsed_header,
-			[
-				'kid' => null,
-				'alg' => null,
-				'typ' => 'JWT',
-			]
-		);
+		$token_parts = explode( '.', $this->token );
+		$header      = json_decode( $this->base64_decode_url( $token_parts[0] ) );
 
-		if ( ! $parsed_header['kid'] || ! $parsed_header['alg'] ) {
-			throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-oauth' ) );
+		if ( ! property_exists( $header, 'kid' ) ) {
+			throw new Exception( esc_html__( 'Key ID not found in token header', 'login-with-oauth' ) );
 		}
 
-		$pubkey_pem           = $this->get_public_key( $parsed_header['kid'] );
-		$decryption_key       = openssl_pkey_get_public( $pubkey_pem );
-		$data                 = $this->base64_encode_url( $header ) . '.' . $this->base64_encode_url( $payload );
-		$calculated_signature = openssl_verify( $data, $this->base64_decode_url( $obtained_signature ), $decryption_key, self::get_supported_algorithm( $parsed_header['alg'] ) );
+		$public_key = $this->get_public_key( $header->kid );
 
-		if ( 1 === (int) $calculated_signature ) {
-			$this->current_user = json_decode( $payload );
-
-			return;
+		if ( ! $public_key ) {
+			throw new Exception( esc_html__( 'Public key not found for the given key ID', 'login-with-oauth' ) );
 		}
 
-		throw new Exception( esc_html__( 'Cannot verify the ID token signature. Please try again.', 'login-with-oauth' ) );
+		$signature = $this->base64_decode_url( $token_parts[2] );
+		$data      = $token_parts[0] . '.' . $token_parts[1];
+		$algo      = self::get_supported_algorithm( $header->alg );
+
+		$verified = openssl_verify( $data, $signature, $public_key, $algo );
+
+		if ( 1 !== $verified ) {
+			throw new Exception( esc_html__( 'Token signature verification failed', 'login-with-oauth' ) );
+		}
 	}
 
 	/**
-	 * Check the validity of data.
+	 * Validate the token data.
 	 *
-	 * @throws Exception If user is not set.
+	 * @return void
+	 * @throws Exception Token data validation failure.
 	 */
 	private function valid_data(): void {
-		if ( is_null( $this->current_user ) ) {
-			throw new Exception( esc_html__( 'No user present to validate', 'login-with-oauth' ) );
+		if ( ! property_exists( $this->current_user, 'iss' ) ) {
+			throw new Exception( esc_html__( 'Issuer not found in token', 'login-with-oauth' ) );
 		}
 
-		if ( $this->settings->client_id !== $this->current_user->aud ) {
-			throw new Exception( esc_html__( 'Invalid data found for authentication', 'login-with-oauth' ) );
+		if ( ! property_exists( $this->current_user, 'aud' ) ) {
+			throw new Exception( esc_html__( 'Audience not found in token', 'login-with-oauth' ) );
 		}
 
-		if ( ! in_array( $this->current_user->iss, [ 'accounts.oauth.com', 'https://accounts.oauth.com' ], true ) ) {
-			throw new Exception( esc_html__( 'Invalid source found for authentication', 'login-with-oauth' ) );
+		if ( ! property_exists( $this->current_user, 'exp' ) ) {
+			throw new Exception( esc_html__( 'Expiration time not found in token', 'login-with-oauth' ) );
 		}
 
-		if ( $this->current_user->exp < strtotime( 'now' ) ) {
-			throw new Exception( esc_html__( 'User data is stale! Please try again.', 'login-with-oauth' ) );
+		// Check if token is expired
+		if ( time() > $this->current_user->exp ) {
+			throw new Exception( esc_html__( 'Token has expired', 'login-with-oauth' ) );
+		}
+
+		// Check issuer based on provider configuration
+		$valid_issuers = $this->get_valid_issuers();
+		if ( ! in_array( $this->current_user->iss, $valid_issuers, true ) ) {
+			throw new Exception( esc_html__( 'Invalid token issuer', 'login-with-oauth' ) );
+		}
+
+		// Check audience (should match client ID)
+		if ( $this->current_provider && $this->current_user->aud !== $this->current_provider->get_client_id() ) {
+			throw new Exception( esc_html__( 'Token audience does not match client ID', 'login-with-oauth' ) );
 		}
 	}
 
 	/**
-	 * Get max age to cache the response from Cache-Control header.
+	 * Get valid issuers for the current provider.
 	 *
-	 * @param Requests_Utility_CaseInsensitiveDictionary $headers List of response headers.
+	 * @return array
+	 */
+	private function get_valid_issuers(): array {
+		if ( $this->current_provider ) {
+			$config = $this->current_provider->get_config();
+			
+			// Allow providers to specify their own valid issuers
+			if ( ! empty( $config['valid_issuers'] ) ) {
+				return $config['valid_issuers'];
+			}
+
+			// For Google provider, use Google-specific issuers
+			if ( $this->current_provider->get_name() === 'google' ) {
+				return [ 'accounts.google.com', 'https://accounts.google.com' ];
+			}
+		}
+
+		// Default fallback - allow any issuer (less secure but more flexible)
+		return [ $this->current_user->iss ?? '' ];
+	}
+
+	/**
+	 * Get max age from headers.
+	 *
+	 * @param Requests_Utility_CaseInsensitiveDictionary $headers Headers.
 	 *
 	 * @return int
 	 */
 	private function get_max_age( Requests_Utility_CaseInsensitiveDictionary $headers ): int {
-		if ( ! $headers->offsetExists( 'cache-control' ) ) {
+		$cache_control = $headers->getValues( 'cache-control' );
+
+		if ( ! $cache_control ) {
 			return 0;
 		}
 
-		$cache_control = $headers->offsetGet( 'cache-control' );
-		$cache_control = explode( ',', $cache_control );
-		$cache_control = array_map( 'trim', $cache_control );
-		$cache_control = preg_grep( '/max-age=(\d+)?/', $cache_control );
+		$cache_control = $cache_control[0];
+		preg_match( '/max-age=(\d+)/', $cache_control, $matches );
 
-		if ( is_array( $cache_control ) && 1 === count( $cache_control ) ) {
-			$max_age = array_pop( $cache_control );
-			$max_age = explode( '=', $max_age );
-			$max_age = $max_age[1];
-
-			return intval( $max_age );
-		}
-
-		return 0;
+		return isset( $matches[1] ) ? (int) $matches[1] : 0;
 	}
 
 	/**
-	 * Set the public key in transient.
+	 * Set transient.
 	 *
-	 * @param string $key    Transient key.
-	 * @param string $value  Transient value.
-	 * @param int    $expire Transient expiration time in seconds.
+	 * @param string $key   Key.
+	 * @param string $value Value.
+	 * @param int    $expire Expire time.
 	 *
 	 * @return void
 	 */
@@ -322,9 +394,9 @@ class TokenVerifier {
 	}
 
 	/**
-	 * Retrieve the transient.
+	 * Get transient.
 	 *
-	 * @param string $key Transient key.
+	 * @param string $key Key.
 	 *
 	 * @return mixed
 	 */

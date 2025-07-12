@@ -29,7 +29,7 @@ jobs:
         generate-zip: 'true'
         dry-run: ${{ startsWith(github.ref, 'refs/tags/dry') }}
       env:
-        SLUG: 'login-with-oauth'
+        SLUG: 'wp-oauth-login'
         ASSETS_DIR: 'wp-assets'
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

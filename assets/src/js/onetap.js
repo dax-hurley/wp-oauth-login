@@ -19,7 +19,7 @@ window.LoginWithOAuthDataCallBack = function( response ) {
                     var homeurl = new URL( TempAccessOneTap.homeurl );
 
                     if ( redirect_to.host !== homeurl.host ) {
-                        throw new URIError( wp.i18n.__( 'Invalid URL for Redirection', 'login-with-oauth' ) );
+                        throw new URIError( wp.i18n.__( 'Invalid URL for Redirection', 'wp-oauth-login' ) );
                     }
 
                 } catch ( e ) {

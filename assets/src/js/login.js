@@ -1,7 +1,7 @@
 /**
  * JS for Login and Register page.
  *
- * @package login-with-oauth
+ * @package wp-oauth-login
  */
 
 const wpOAuthLogin = {
@@ -32,7 +32,7 @@ const wpOAuthLogin = {
 		// Set cookie if "WP OAuth Login" button displayed to bypass page cache
 		// Do not set on wp login or registration page.
 		if ( document.querySelector( '.wp_oauth_login' ) && null === this.form ) {
-			document.cookie = 'vip-go-cb=1;wp-login-with-oauth=1;path=' + encodeURI(window.location.pathname) + ';';
+			document.cookie = 'vip-go-cb=1;wp-wp-oauth-login=1;path=' + encodeURI(window.location.pathname) + ';';
 		}
 
 		if ( null === this.form ) {

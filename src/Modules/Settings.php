@@ -5,7 +5,7 @@
  *
  * @package DaxHurley\OAuthLogin
  * @since 1.0.0
- * @author rtCamp <contact@daxhurley.com>
+ * @author Dax Hurley <dax.hurley@gmail.com>
  */
 
 declare(strict_types=1);
@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DaxHurley\OAuthLogin\Modules;
 
 use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
+use DaxHurley\OAuthLogin\Utils\ProviderManager;
 
 /**
  * Class Settings.
@@ -36,6 +37,13 @@ class Settings implements ModuleInterface {
 	public $options;
 
 	/**
+	 * Provider manager instance.
+	 *
+	 * @var ProviderManager
+	 */
+	private $provider_manager;
+
+	/**
 	 * Getters for settings values.
 	 *
 	 * @var string[]
@@ -48,6 +56,13 @@ class Settings implements ModuleInterface {
 		'WP_OAUTH_ONE_TAP_LOGIN'           => 'one_tap_login',
 		'WP_OAUTH_ONE_TAP_LOGIN_SCREEN'    => 'one_tap_login_screen',
 	];
+
+	/**
+	 * Settings constructor.
+	 */
+	public function __construct() {
+		$this->provider_manager = new ProviderManager();
+	}
 
 	/**
 	 * Getter method.
@@ -82,6 +97,38 @@ class Settings implements ModuleInterface {
 		$this->options = get_option( 'wp_oauth_login_settings', [] );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_menu', [ $this, 'settings_page' ] );
+		add_action( 'wp_ajax_save_provider', [ $this, 'save_provider_ajax' ] );
+		add_action( 'wp_ajax_delete_provider', [ $this, 'delete_provider_ajax' ] );
+		add_action( 'admin_notices', [ $this, 'show_migration_notice' ] );
+		add_action( 'admin_init', [ $this, 'handle_migration' ] );
+	}
+
+	/**
+	 * Show migration notice if needed.
+	 *
+	 * @return void
+	 */
+	public function show_migration_notice(): void {
+		if ( \DaxHurley\OAuthLogin\Utils\Migration::is_migration_needed() ) {
+			echo \DaxHurley\OAuthLogin\Utils\Migration::get_migration_notice();
+		}
+	}
+
+	/**
+	 * Handle migration process.
+	 *
+	 * @return void
+	 */
+	public function handle_migration(): void {
+		if ( isset( $_GET['page'] ) && 'login-with-oauth' === $_GET['page'] && isset( $_GET['migrate'] ) && '1' === $_GET['migrate'] ) {
+			if ( \DaxHurley\OAuthLogin\Utils\Migration::migrate() ) {
+				wp_redirect( admin_url( 'options-general.php?page=login-with-oauth&migration=success' ) );
+				exit;
+			} else {
+				wp_redirect( admin_url( 'options-general.php?page=login-with-oauth&migration=failed' ) );
+				exit;
+			}
+		}
 	}
 
 	/**
@@ -94,28 +141,10 @@ class Settings implements ModuleInterface {
 
 		add_settings_section(
 			'wp_oauth_login_section',
-			__( 'Log in with OAuth Settings', 'login-with-oauth' ),
+			__( 'OAuth Providers', 'login-with-oauth' ),
 			function () {
 			},
 			'login-with-oauth'
-		);
-
-		add_settings_field(
-			'wp_oauth_login_client_id',
-			__( 'Client ID', 'login-with-oauth' ),
-			[ $this, 'client_id_field' ],
-			'login-with-oauth',
-			'wp_oauth_login_section',
-			[ 'label_for' => 'client-id' ]
-		);
-
-		add_settings_field(
-			'wp_oauth_login_client_secret',
-			__( 'Client Secret', 'login-with-oauth' ),
-			[ $this, 'client_secret_field' ],
-			'login-with-oauth',
-			'wp_oauth_login_section',
-			[ 'label_for' => 'client-secret' ]
 		);
 
 		add_settings_field(
@@ -153,40 +182,6 @@ class Settings implements ModuleInterface {
 			'wp_oauth_login_section',
 			[ 'label_for' => 'whitelisted-domains' ]
 		);
-	}
-
-	/**
-	 * Render client ID field.
-	 *
-	 * @return void
-	 */
-	public function client_id_field(): void {
-		?>
-		<input type='text' name='wp_oauth_login_settings[client_id]' id="client-id" value='<?php echo esc_attr( $this->client_id ); ?>' autocomplete="off" <?php $this->disabled( 'client_id' ); ?> />
-		<p class="description">
-			<?php
-			echo wp_kses_post(
-				sprintf(
-					'<p>%1s <a target="_blank" href="%2s">%3s</a>.</p>',
-					esc_html__( 'Create oAuth Client ID and Client Secret at', 'login-with-oauth' ),
-					'https://console.developers.oauth.com/apis/dashboard',
-					'console.developers.oauth.com'
-				)
-			);
-			?>
-		</p>
-		<?php
-	}
-
-	/**
-	 * Render client secret field.
-	 *
-	 * @return void
-	 */
-	public function client_secret_field(): void {
-		?>
-		<input type='password' name='wp_oauth_login_settings[client_secret]' id="client-secret" value='<?php echo esc_attr( $this->client_secret ); ?>' autocomplete="off" <?php $this->disabled( 'client_secret' ); ?> />
-		<?php
 	}
 
 	/**
@@ -327,15 +322,320 @@ class Settings implements ModuleInterface {
 	public function output(): void {
 		?>
 		<div class="wrap">
-		<form action='options.php' method='post'>
+			<h1><?php esc_html_e( 'WP OAuth Login Settings', 'login-with-oauth' ); ?></h1>
+			
 			<?php
-			settings_fields( 'wp_oauth_login' );
-			do_settings_sections( 'login-with-oauth' );
-			submit_button();
+			// Show migration status
+			if ( isset( $_GET['migration'] ) ) {
+				if ( 'success' === $_GET['migration'] ) {
+					echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Migration completed successfully! Your Google OAuth settings have been preserved.', 'login-with-oauth' ) . '</p></div>';
+				} elseif ( 'failed' === $_GET['migration'] ) {
+					echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Migration failed. Please check your settings and try again.', 'login-with-oauth' ) . '</p></div>';
+				}
+			}
+
+			// Show migration status info
+			$migration_status = \DaxHurley\OAuthLogin\Utils\Migration::get_migration_status();
+			if ( $migration_status['has_old_settings'] && ! $migration_status['migration_complete'] ) {
+				echo '<div class="notice notice-info is-dismissible">';
+				echo '<p><strong>' . esc_html__( 'Migration Status', 'login-with-oauth' ) . '</strong></p>';
+				echo '<p>' . esc_html__( 'You have old OAuth settings that need to be migrated to the new provider system.', 'login-with-oauth' ) . '</p>';
+				echo '<p><a href="' . admin_url( 'options-general.php?page=login-with-oauth&migrate=1' ) . '" class="button button-primary">' . esc_html__( 'Migrate Now', 'login-with-oauth' ) . '</a></p>';
+				echo '</div>';
+			}
 			?>
-		</form>
+			
+			<!-- Provider Management Section -->
+			<div class="oauth-providers-section">
+				<h2><?php esc_html_e( 'OAuth Providers', 'login-with-oauth' ); ?></h2>
+				<p><?php esc_html_e( 'Configure your OAuth 2.0 providers below. You can add multiple providers to allow users to login with different services.', 'login-with-oauth' ); ?></p>
+				
+				<div class="oauth-providers-list">
+					<?php $this->render_providers_list(); ?>
+				</div>
+				
+				<div class="oauth-provider-form">
+					<h3><?php esc_html_e( 'Add New Provider', 'login-with-oauth' ); ?></h3>
+					<?php $this->render_provider_form(); ?>
+				</div>
+			</div>
+
+			<!-- General Settings Section -->
+			<div class="oauth-general-settings">
+				<h2><?php esc_html_e( 'General Settings', 'login-with-oauth' ); ?></h2>
+				<form action='options.php' method='post'>
+					<?php
+					settings_fields( 'wp_oauth_login' );
+					do_settings_sections( 'login-with-oauth' );
+					submit_button();
+					?>
+				</form>
+			</div>
 		</div>
+
+		<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			// Handle provider form submission
+			$('#oauth-provider-form').on('submit', function(e) {
+				e.preventDefault();
+				
+				var formData = $(this).serialize();
+				formData += '&action=save_provider&nonce=<?php echo wp_create_nonce( 'save_provider' ); ?>';
+				
+				$.post(ajaxurl, formData, function(response) {
+					if (response.success) {
+						location.reload();
+					} else {
+						alert(response.data || 'Error saving provider');
+					}
+				});
+			});
+
+			// Handle provider deletion
+			$('.delete-provider').on('click', function(e) {
+				e.preventDefault();
+				
+				if (!confirm('<?php esc_html_e( 'Are you sure you want to delete this provider?', 'login-with-oauth' ); ?>')) {
+					return;
+				}
+				
+				var providerName = $(this).data('provider');
+				var formData = {
+					action: 'delete_provider',
+					provider: providerName,
+					nonce: '<?php echo wp_create_nonce( 'delete_provider' ); ?>'
+				};
+				
+				$.post(ajaxurl, formData, function(response) {
+					if (response.success) {
+						location.reload();
+					} else {
+						alert(response.data || 'Error deleting provider');
+					}
+				});
+			});
+		});
+		</script>
 		<?php
+	}
+
+	/**
+	 * Render the providers list.
+	 *
+	 * @return void
+	 */
+	private function render_providers_list(): void {
+		$providers = $this->provider_manager->get_providers();
+		
+		if ( empty( $providers ) ) {
+			echo '<p>' . esc_html__( 'No providers configured yet.', 'login-with-oauth' ) . '</p>';
+			return;
+		}
+
+		echo '<table class="wp-list-table widefat fixed striped">';
+		echo '<thead><tr>';
+		echo '<th>' . esc_html__( 'Provider', 'login-with-oauth' ) . '</th>';
+		echo '<th>' . esc_html__( 'Status', 'login-with-oauth' ) . '</th>';
+		echo '<th>' . esc_html__( 'Actions', 'login-with-oauth' ) . '</th>';
+		echo '</tr></thead>';
+		echo '<tbody>';
+
+		foreach ( $providers as $name => $provider ) {
+			$status = $provider->is_configured() ? 
+				'<span class="status-ok">' . esc_html__( 'Configured', 'login-with-oauth' ) . '</span>' : 
+				'<span class="status-error">' . esc_html__( 'Not Configured', 'login-with-oauth' ) . '</span>';
+			
+			echo '<tr>';
+			echo '<td><strong>' . esc_html( $provider->get_display_name() ) . '</strong><br><small>' . esc_html( $name ) . '</small></td>';
+			echo '<td>' . $status . '</td>';
+			echo '<td>';
+			echo '<button class="button edit-provider" data-provider="' . esc_attr( $name ) . '">' . esc_html__( 'Edit', 'login-with-oauth' ) . '</button> ';
+			echo '<button class="button delete-provider" data-provider="' . esc_attr( $name ) . '">' . esc_html__( 'Delete', 'login-with-oauth' ) . '</button>';
+			echo '</td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody></table>';
+	}
+
+	/**
+	 * Render the provider form.
+	 *
+	 * @return void
+	 */
+	private function render_provider_form(): void {
+		?>
+		<form id="oauth-provider-form" method="post">
+			<table class="form-table">
+				<tr>
+					<th scope="row">
+						<label for="provider_name"><?php esc_html_e( 'Provider Name', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="provider_name" name="provider_name" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'A unique name for this provider (e.g., "mycompany", "github")', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="display_name"><?php esc_html_e( 'Display Name', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="display_name" name="display_name" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'The name shown to users (e.g., "My Company", "GitHub")', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="authorization_url"><?php esc_html_e( 'Authorization URL', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="url" id="authorization_url" name="authorization_url" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'The OAuth 2.0 authorization endpoint URL', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="token_url"><?php esc_html_e( 'Token URL', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="url" id="token_url" name="token_url" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'The OAuth 2.0 token endpoint URL', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="user_info_url"><?php esc_html_e( 'User Info URL', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="url" id="user_info_url" name="user_info_url" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'The user info endpoint URL (e.g., https://api.provider.com/user)', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="client_id"><?php esc_html_e( 'Client ID', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="client_id" name="client_id" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'The OAuth 2.0 client ID from your provider', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="client_secret"><?php esc_html_e( 'Client Secret', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="password" id="client_secret" name="client_secret" class="regular-text" required />
+						<p class="description"><?php esc_html_e( 'The OAuth 2.0 client secret from your provider', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="default_scopes"><?php esc_html_e( 'Default Scopes', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="default_scopes" name="default_scopes" class="regular-text" value="email profile" />
+						<p class="description"><?php esc_html_e( 'Space-separated list of OAuth scopes (e.g., "email profile openid")', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="supports_one_tap"><?php esc_html_e( 'Supports One-Tap Login', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="checkbox" id="supports_one_tap" name="supports_one_tap" value="1" />
+						<p class="description"><?php esc_html_e( 'Check if this provider supports one-tap login (currently only Google supports this)', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="certs_url"><?php esc_html_e( 'Certificates URL', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="url" id="certs_url" name="certs_url" class="regular-text" />
+						<p class="description"><?php esc_html_e( 'URL for JWT certificate verification (optional, only needed for ID token verification)', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="valid_issuers"><?php esc_html_e( 'Valid Issuers', 'login-with-oauth' ); ?></label>
+					</th>
+					<td>
+						<input type="text" id="valid_issuers" name="valid_issuers" class="regular-text" />
+						<p class="description"><?php esc_html_e( 'Comma-separated list of valid JWT issuers (optional, for ID token verification)', 'login-with-oauth' ); ?></p>
+					</td>
+				</tr>
+			</table>
+			<?php submit_button( __( 'Add Provider', 'login-with-oauth' ) ); ?>
+		</form>
+		<?php
+	}
+
+	/**
+	 * Save provider via AJAX.
+	 *
+	 * @return void
+	 */
+	public function save_provider_ajax(): void {
+		check_ajax_referer( 'save_provider', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'login-with-oauth' ) );
+		}
+
+		$provider_name = sanitize_text_field( $_POST['provider_name'] ?? '' );
+		$config = [
+			'name' => $provider_name,
+			'display_name' => sanitize_text_field( $_POST['display_name'] ?? '' ),
+			'authorization_url' => esc_url_raw( $_POST['authorization_url'] ?? '' ),
+			'token_url' => esc_url_raw( $_POST['token_url'] ?? '' ),
+			'user_info_url' => esc_url_raw( $_POST['user_info_url'] ?? '' ),
+			'client_id' => sanitize_text_field( $_POST['client_id'] ?? '' ),
+			'client_secret' => sanitize_text_field( $_POST['client_secret'] ?? '' ),
+			'default_scopes' => sanitize_text_field( $_POST['default_scopes'] ?? 'email profile' ),
+			'supports_one_tap' => isset( $_POST['supports_one_tap'] ) ? true : false,
+			'certs_url' => esc_url_raw( $_POST['certs_url'] ?? '' ),
+			'valid_issuers' => sanitize_text_field( $_POST['valid_issuers'] ?? '' ),
+		];
+
+		// Process valid issuers if provided
+		if ( ! empty( $config['valid_issuers'] ) ) {
+			$issuers = array_map( 'trim', explode( ',', $config['valid_issuers'] ) );
+			$config['valid_issuers'] = array_filter( $issuers );
+		}
+
+		if ( $this->provider_manager->validate_provider_config( $provider_name, $config ) ) {
+			$success = $this->provider_manager->save_provider_config( $provider_name, $config );
+			if ( $success ) {
+				wp_send_json_success( __( 'Provider saved successfully.', 'login-with-oauth' ) );
+			} else {
+				wp_send_json_error( __( 'Failed to save provider.', 'login-with-oauth' ) );
+			}
+		} else {
+			wp_send_json_error( __( 'Invalid provider configuration.', 'login-with-oauth' ) );
+		}
+	}
+
+	/**
+	 * Delete provider via AJAX.
+	 *
+	 * @return void
+	 */
+	public function delete_provider_ajax(): void {
+		check_ajax_referer( 'delete_provider', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'login-with-oauth' ) );
+		}
+
+		$provider_name = sanitize_text_field( $_POST['provider'] ?? '' );
+		
+		if ( $this->provider_manager->delete_provider_config( $provider_name ) ) {
+			wp_send_json_success( __( 'Provider deleted successfully.', 'login-with-oauth' ) );
+		} else {
+			wp_send_json_error( __( 'Failed to delete provider.', 'login-with-oauth' ) );
+		}
 	}
 
 	/**

@@ -5,7 +5,7 @@
 	"authors": [
 		{
 			"name": "rtCamp",
-			"email": "contact@daxhurley.com",
+			"email": "contact@rtcamp.com",
 			"homepage": "https://rtcamp.com/",
 			"role": "Orginal Plugin Developer"
 		},
@@ -71,7 +71,7 @@
 			"@cs",
 			"@tests:unit"
 		],
-		"pot": "./vendor/bin/wp i18n make-pot . --exclude=\"assets/src,assets/node_modules,node_modules,tests,vendor\" ./languages/login-with-oauth.pot",
+		"pot": "./vendor/bin/wp i18n make-pot . --exclude=\"assets/src,assets/node_modules,node_modules,tests,vendor\" ./languages/wp-oauth-login.pot",
 		"build-plugin-zip": "./bin/build-plugin-zip.sh"
 	}
 }

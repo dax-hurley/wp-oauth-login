@@ -13,12 +13,13 @@ namespace DaxHurley\OAuthLogin\Modules;
 use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
 use DaxHurley\OAuthLogin\Utils\Helper;
 use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Utils\ProviderManager;
 use function DaxHurley\OAuthLogin\plugin;
 
 /**
  * Class Shortcode
  *
- * @package DaxHurley\OAuthLogin
+ * @package DaxHurley\OAuthLogin\Modules
  */
 class Shortcode implements ModuleInterface {
 
@@ -41,7 +42,7 @@ class Shortcode implements ModuleInterface {
 	 *
 	 * @var OAuthClient
 	 */
-	private $gh_client;
+	private $oauth_client;
 
 	/**
 	 * Assets object.
@@ -51,14 +52,22 @@ class Shortcode implements ModuleInterface {
 	private $assets;
 
 	/**
+	 * Provider manager instance.
+	 *
+	 * @var ProviderManager
+	 */
+	private $provider_manager;
+
+	/**
 	 * Shortcode constructor.
 	 *
-	 * @param OAuthClient $client GH Client object.
+	 * @param OAuthClient $client OAuth Client object.
 	 * @param Assets       $assets Assets object.
 	 */
 	public function __construct( OAuthClient $client, Assets $assets ) {
-		$this->gh_client = $client;
+		$this->oauth_client = $client;
 		$this->assets    = $assets;
+		$this->provider_manager = plugin()->container()->get( 'provider_manager' );
 	}
 
 	/**
@@ -89,9 +98,10 @@ class Shortcode implements ModuleInterface {
 		$redirect_to = Helper::get_redirect_url();
 		$attrs       = shortcode_atts(
 			[
-				'button_text'   => __( 'Login with oauth', 'login-with-oauth' ),
+				'button_text'   => __( 'Login with OAuth', 'login-with-oauth' ),
 				'force_display' => 'no',
 				'redirect_to'   => $redirect_to,
+				'provider'      => '',
 			],
 			$attrs,
 			self::TAG
@@ -107,7 +117,23 @@ class Shortcode implements ModuleInterface {
 		
 		Helper::set_redirect_state_filter( $redirect_to );
 
-		$attrs['login_url'] = $this->gh_client->authorization_url();
+		// Get the provider to use
+		$provider = null;
+		if ( ! empty( $attrs['provider'] ) ) {
+			$provider = $this->provider_manager->get_provider( $attrs['provider'] );
+		}
+		
+		if ( ! $provider ) {
+			$provider = $this->provider_manager->get_first_configured_provider();
+		}
+
+		if ( $provider ) {
+			$attrs['login_url'] = $provider->get_authorization_url_with_params();
+			$attrs['provider_name'] = $provider->get_display_name();
+		} else {
+			$attrs['login_url'] = '';
+			$attrs['provider_name'] = '';
+		}
 
 		Helper::remove_redirect_state_filter();
 		

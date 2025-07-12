@@ -1,41 +1,40 @@
 <?php
 /**
- * One Tap Login Class.
+ * One Tap Login.
  *
- * This class will be responsible for handling
- * OAuth's one tap login for web functioning.
+ * This will handle the one tap login functionality.
  *
- * @package DaxHurley\OAuthLogin\Modules
- * @since 1.0.16
+ * @package DaxHurley\OAuthLogin
+ * @since 1.0.0
  */
 
 declare(strict_types=1);
 
 namespace DaxHurley\OAuthLogin\Modules;
 
-use Exception;
-use DaxHurley\OAuthLogin\Utils\Authenticator;
-use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
 use DaxHurley\OAuthLogin\Utils\Helper;
-use DaxHurley\OAuthLogin\Interfaces\Module;
+use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Utils\Authenticator;
+use DaxHurley\OAuthLogin\Utils\ProviderManager;
 use DaxHurley\OAuthLogin\Utils\TokenVerifier;
-use function DaxHurley\OAuthLogin\plugin;
+use Exception;
 
 /**
- * Class OneTapLogin
+ * Class OneTapLogin.
  *
  * @package DaxHurley\OAuthLogin\Modules
  */
-class OneTapLogin implements Module {
+class OneTapLogin implements ModuleInterface {
 	/**
-	 * Settings Module.
+	 * Settings instance.
 	 *
 	 * @var Settings
 	 */
 	private $settings;
 
 	/**
-	 * Token verifier.
+	 * Token verifier instance.
 	 *
 	 * @var TokenVerifier
 	 */
@@ -49,11 +48,18 @@ class OneTapLogin implements Module {
 	private $oauth_client;
 
 	/**
-	 * Authenticator service.
+	 * Authenticator instance.
 	 *
 	 * @var Authenticator
 	 */
 	private $authenticator;
+
+	/**
+	 * Provider manager instance.
+	 *
+	 * @var ProviderManager
+	 */
+	private $provider_manager;
 
 	/**
 	 * OneTapLogin constructor.
@@ -68,6 +74,7 @@ class OneTapLogin implements Module {
 		$this->token_verifier = $verifier;
 		$this->oauth_client  = $client;
 		$this->authenticator  = $authenticator;
+		$this->provider_manager = plugin()->container()->get( 'provider_manager' );
 	}
 
 	/**
@@ -104,8 +111,29 @@ class OneTapLogin implements Module {
 	 * @return void
 	 */
 	public function one_tap_prompt(): void {
+		$provider = $this->provider_manager->get_first_configured_provider();
+		if ( ! $provider ) {
+			return;
+		}
+
+		// Check if this provider supports one-tap login
+		if ( ! $this->provider_supports_one_tap( $provider ) ) {
+			return;
+		}
+
+		$one_tap_config = $this->get_one_tap_config( $provider );
 		?>
-		<div id="g_id_onload" data-use_fedcm_for_prompt="true" data-client_id="<?php echo esc_attr( $this->settings->client_id ); ?>" data-login_uri="<?php echo esc_attr( wp_login_url() ); ?>" data-callback="LoginWithOAuthDataCallBack"></div>
+		<div id="g_id_onload" 
+			data-use_fedcm_for_prompt="true" 
+			data-client_id="<?php echo esc_attr( $provider->get_client_id() ); ?>" 
+			data-login_uri="<?php echo esc_attr( wp_login_url() ); ?>" 
+			data-callback="LoginWithOAuthDataCallBack"
+			<?php if ( ! empty( $one_tap_config['additional_attributes'] ) ): ?>
+				<?php foreach ( $one_tap_config['additional_attributes'] as $key => $value ): ?>
+					data-<?php echo esc_attr( $key ); ?>="<?php echo esc_attr( $value ); ?>"
+				<?php endforeach; ?>
+			<?php endif; ?>
+		></div>
 		<?php
 	}
 
@@ -119,14 +147,28 @@ class OneTapLogin implements Module {
 			return;
 		}
 
+		$provider = $this->provider_manager->get_first_configured_provider();
+		if ( ! $provider ) {
+			return;
+		}
+
+		// Check if this provider supports one-tap login
+		if ( ! $this->provider_supports_one_tap( $provider ) ) {
+			return;
+		}
+
 		$filename     = ( defined( 'WP_SCRIPT_DEBUG' ) && true === WP_SCRIPT_DEBUG ) ? 'onetap.min.js' : 'onetap.js';
 		$redirects_to = Helper::get_redirect_url();
 
 		Helper::set_redirect_state_filter( $redirects_to );
 
+		// Get the one-tap script URL for this provider
+		$one_tap_config = $this->get_one_tap_config( $provider );
+		$script_url = $one_tap_config['script_url'] ?? 'https://accounts.google.com/gsi/client';
+
 		wp_enqueue_script(
 			'login-with-oauth-one-tap',
-			'https://accounts.oauth.com/gsi/client',
+			$script_url,
 			[],
 			filemtime( trailingslashit( plugin()->path ) . 'assets/build/js/onetap.js' ),
 			true
@@ -134,8 +176,9 @@ class OneTapLogin implements Module {
 
 		$data = [
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
-			'state'   => $this->oauth_client->state(),
+			'state'   => $provider->get_state(),
 			'homeurl' => get_option( 'home', '' ),
+			'provider' => $provider->get_name(),
 		];
 
 		Helper::remove_redirect_state_filter();
@@ -166,6 +209,58 @@ class OneTapLogin implements Module {
 	}
 
 	/**
+	 * Check if a provider supports one-tap login.
+	 *
+	 * @param \DaxHurley\OAuthLogin\Interfaces\Provider $provider Provider instance.
+	 * @return bool
+	 */
+	private function provider_supports_one_tap( $provider ): bool {
+		$config = $provider->get_config();
+		
+		// Check if provider explicitly supports one-tap
+		if ( isset( $config['supports_one_tap'] ) ) {
+			return (bool) $config['supports_one_tap'];
+		}
+
+		// Default: Only Google supports one-tap login
+		return $provider->get_name() === 'google';
+	}
+
+	/**
+	 * Get one-tap configuration for a provider.
+	 *
+	 * @param \DaxHurley\OAuthLogin\Interfaces\Provider $provider Provider instance.
+	 * @return array
+	 */
+	private function get_one_tap_config( $provider ): array {
+		$config = $provider->get_config();
+		
+		// Default configuration
+		$default_config = [
+			'script_url' => 'https://accounts.google.com/gsi/client',
+			'additional_attributes' => [],
+		];
+
+		// Allow providers to override one-tap configuration
+		if ( ! empty( $config['one_tap_config'] ) ) {
+			return array_merge( $default_config, $config['one_tap_config'] );
+		}
+
+		// Provider-specific configurations
+		switch ( $provider->get_name() ) {
+			case 'google':
+				return $default_config;
+			
+			default:
+				// For other providers, return empty config (no one-tap support)
+				return [
+					'script_url' => '',
+					'additional_attributes' => [],
+				];
+		}
+	}
+
+	/**
 	 * Validate the ID token.
 	 *
 	 * @return void
@@ -174,7 +269,9 @@ class OneTapLogin implements Module {
 	public function validate_token(): void {
 		try {
 			$token    = Helper::filter_input( INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			$verified = $this->token_verifier->verify_token( $token );
+			$provider = Helper::filter_input( INPUT_POST, 'provider', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			
+			$verified = $this->token_verifier->verify_token( $token, $provider );
 
 			if ( ! $verified ) {
 				throw new Exception( __( 'Cannot verify the credentials', 'login-with-oauth' ) );
@@ -193,16 +290,15 @@ class OneTapLogin implements Module {
 			$state         = Helper::filter_input( INPUT_POST, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null;    // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 
-			if ( is_array( $decoded_state ) && ! empty( $decoded_state['provider'] ) && 'oauth' === $decoded_state['provider'] ) {
+			if ( is_array( $decoded_state ) && ! empty( $decoded_state['provider'] ) ) {
 				$redirect_to = $decoded_state['redirect_to'] ?? $redirect_to;
 			}
 
 			wp_send_json_success(
 				[
-					'redirect' => $redirect_to,
+					'redirect_to' => $redirect_to,
 				]
 			);
-			die;
 
 		} catch ( Exception $e ) {
 			wp_send_json_error( $e->getMessage() );
@@ -210,19 +306,28 @@ class OneTapLogin implements Module {
 	}
 
 	/**
-	 * Authenticate the user in WordPress.
+	 * Authenticate user after token verification.
 	 *
 	 * @return void
-	 * @throws Exception Authentication exception.
 	 */
 	public function authenticate(): void {
-		$user = $this->token_verifier->current_user();
+		$current_user = $this->token_verifier->current_user();
 
-		if ( is_null( $user ) ) {
-			throw new Exception( esc_html__( 'User not found to authenticate', 'login-with-oauth' ) );
+		if ( ! $current_user ) {
+			return;
 		}
 
-		$wp_user = $this->authenticator->authenticate( $user );
-		$this->authenticator->set_auth_cookies( $wp_user );
+		$user = $this->authenticator->authenticate( $current_user );
+
+		if ( $user instanceof \WP_User ) {
+			/**
+			 * Fires once the user has been authenticated via OAuth one tap login.
+			 *
+			 * @since 1.0.16
+			 *
+			 * @param WP_User $user WP User object.
+			 */
+			do_action( 'daxhurley.oauth_user_authenticated', $user );
+		}
 	}
 }

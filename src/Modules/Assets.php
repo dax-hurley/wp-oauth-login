@@ -28,7 +28,14 @@ class Assets implements ModuleInterface {
 	 *
 	 * @var string
 	 */
-	const LOGIN_BUTTON_STYLE_HANDLE = 'login-with-oauth';
+	const LOGIN_BUTTON_STYLE_HANDLE = 'wp-oauth-login';
+
+	/**
+	 * Handle for admin style.
+	 *
+	 * @var string
+	 */
+	const ADMIN_STYLE_HANDLE = 'wp-oauth-login-admin';
 
 	/**
 	 * Module name.
@@ -46,6 +53,7 @@ class Assets implements ModuleInterface {
 	 */
 	public function init(): void {
 		add_action( 'login_enqueue_scripts', [ $this, 'enqueue_login_styles' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_styles' ] );
 	}
 
 	/**
@@ -57,6 +65,17 @@ class Assets implements ModuleInterface {
 	 */
 	public function register_login_styles(): void {
 		$this->register_style( self::LOGIN_BUTTON_STYLE_HANDLE, 'build/css/button/style.css' );
+	}
+
+	/**
+	 * Register style/script for Admin Page.
+	 *
+	 * @action admin_enqueue_scripts
+	 *
+	 * @return void
+	 */
+	public function register_admin_styles(): void {
+		$this->register_style( self::ADMIN_STYLE_HANDLE, 'css/admin.css' );
 	}
 
 	/**
@@ -72,12 +91,34 @@ class Assets implements ModuleInterface {
 			$this->register_login_styles();
 		}
 
-		if ( ! wp_script_is( 'login-with-oauth-script', 'registered' ) ) {
-			$this->register_script( 'login-with-oauth-script', 'build/js/login.js' );
+		if ( ! wp_script_is( 'wp-oauth-login-script', 'registered' ) ) {
+			$this->register_script( 'wp-oauth-login-script', 'build/js/login.js' );
 		}
 
-		wp_enqueue_script( 'login-with-oauth-script' );
+		wp_enqueue_script( 'wp-oauth-login-script' );
 		wp_enqueue_style( self::LOGIN_BUTTON_STYLE_HANDLE );
+	}
+
+	/**
+	 * Enqueue the admin style.
+	 *
+	 * @param string $hook_suffix The current admin page.
+	 * @return void
+	 */
+	public function enqueue_admin_styles( string $hook_suffix ): void {
+		// Only enqueue on our settings page
+		if ( 'settings_page_login-with-oauth' !== $hook_suffix ) {
+			return;
+		}
+
+		/**
+		 * If style is not registered, register it.
+		 */
+		if ( ! wp_style_is( self::ADMIN_STYLE_HANDLE, 'registered' ) ) {
+			$this->register_admin_styles();
+		}
+
+		wp_enqueue_style( self::ADMIN_STYLE_HANDLE );
 	}
 
 	/**

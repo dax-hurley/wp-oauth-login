@@ -17,6 +17,7 @@ namespace DaxHurley\OAuthLogin\Modules;
 
 use DaxHurley\OAuthLogin\Utils\Helper;
 use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Utils\ProviderManager;
 use DaxHurley\OAuthLogin\Interfaces\Module;
 use function DaxHurley\OAuthLogin\plugin;
 
@@ -49,6 +50,13 @@ class Block implements Module {
 	public $client;
 
 	/**
+	 * Provider manager instance.
+	 *
+	 * @var ProviderManager
+	 */
+	private $provider_manager;
+
+	/**
 	 * Module name.
 	 *
 	 * @return string
@@ -66,6 +74,7 @@ class Block implements Module {
 	public function __construct( Assets $assets, OAuthClient $client ) {
 		$this->assets = $assets;
 		$this->client = $client;
+		$this->provider_manager = plugin()->container()->get( 'provider_manager' );
 	}
 
 	/**
@@ -130,9 +139,15 @@ class Block implements Module {
 			! is_user_logged_in() ||
 			apply_filters( 'daxhurley.oauth_login_button_display', false )
 		) {
+			// Get the provider to use
+			$provider = $this->provider_manager->get_first_configured_provider();
+			$login_url = $provider ? $provider->get_authorization_url_with_params() : '#';
+			$provider_name = $provider ? $provider->get_display_name() : '';
+
 			$markup = $this->markup(
 				[
-					'login_url'           => $this->client->authorization_url(),
+					'login_url'           => $login_url,
+					'provider_name'       => $provider_name,
 					'custom_btn_text'     => $attributes['buttonText'] ?? false,
 					'force_display_block' => $attributes['forceDisplay'] ?? false,
 				]
@@ -165,6 +180,7 @@ class Block implements Module {
 			$args,
 			[
 				'login_url'       => '#',
+				'provider_name'   => '',
 				'custom_btn_text' => '',
 				'forceDisplay'    => false,
 			]

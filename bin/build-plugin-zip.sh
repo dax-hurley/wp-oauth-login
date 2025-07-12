@@ -8,7 +8,7 @@ SCRIPT_DIR=$(dirname "$0")
 cd "$SCRIPT_DIR/.." || exit 1
 
 # Define environment variables
-PLUGIN_SLUG="login-with-oauth"
+PLUGIN_SLUG="wp-oauth-login"
 
 # Extract version from readme.txt
 VERSION=$(grep -m1 "Stable tag:" readme.txt | awk '{print $NF}')

@@ -45,14 +45,14 @@ export default function Edit( { attributes, setAttributes, className } ) {
 			setAttributes( { buttonText: value } );
 		},
 		value: buttonText,
-		placeholder: __( 'WP OAuth Login', 'login-with-oauth' ),
+		placeholder: __( 'WP OAuth Login', 'wp-oauth-login' ),
 	};
 
 	const forceDisplayAttributes = {
-		label: __( 'Display Logout', 'login-with-oauth' ),
+		label: __( 'Display Logout', 'wp-oauth-login' ),
 		help: __(
 			'If the user is logged in, keeping this box unchecked will remove the WP OAuth Login button from the page. If the box is checked, the button will show with title changed to ‘Logout’',
-			'login-with-oauth'
+			'wp-oauth-login'
 		),
 		checked: forceDisplay,
 		onChange: ( val ) => {
@@ -64,7 +64,7 @@ export default function Edit( { attributes, setAttributes, className } ) {
 		<div { ...useBlockProps() }>
 			<InspectorControls>
 				<Panel>
-					<PanelBody title={ __( 'Settings', 'login-with-oauth' ) }>
+					<PanelBody title={ __( 'Settings', 'wp-oauth-login' ) }>
 						<CheckboxControl { ...forceDisplayAttributes } />
 					</PanelBody>
 				</Panel>

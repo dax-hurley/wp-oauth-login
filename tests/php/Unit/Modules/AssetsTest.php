@@ -27,6 +27,61 @@ class AssetsTest extends TestCase {
 	private $testee;
 
 	public function setUp(): void {
+		\WP_Mock::userFunction(
+			'wp_register_style',
+			[
+				'return' => true,
+			]
+		);
+
+		\WP_Mock::userFunction(
+			'wp_register_script',
+			[
+				'return' => true,
+			]
+		);
+
+		\WP_Mock::userFunction(
+			'wp_enqueue_style',
+			[
+				'return' => true,
+			]
+		);
+
+		\WP_Mock::userFunction(
+			'wp_enqueue_script',
+			[
+				'return' => true,
+			]
+		);
+
+		\WP_Mock::userFunction(
+			'wp_style_is',
+			[
+				'return' => false,
+			]
+		);
+
+		\WP_Mock::userFunction(
+			'wp_script_is',
+			[
+				'return' => false,
+			]
+		);
+
+		// Mock plugin function
+		\WP_Mock::userFunction(
+			'DaxHurley\OAuthLogin\plugin',
+			[
+				'return' => (object) [
+					'url' => 'https://example.com/',
+					'assets_dir' => 'https://example.com/assets',
+				],
+			]
+		);
+
+		parent::setUp();
+		
 		$this->testee = new Testee();
 	}
 
@@ -75,11 +130,11 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_style',
 			[
-				'login-with-oauth',
-				'https://example.com/assets/build/css/login.css',
+				'wp-oauth-login',
+				'https://example.com/assets/build/css/button/style.css',
 				[],
 				false,
-				true,
+				'all',
 			],
 			1,
 			true
@@ -108,7 +163,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_script',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 				'https://example.com/assets/js/login.js',
 				[
 					'some-other-script'
@@ -121,7 +176,7 @@ class AssetsTest extends TestCase {
 		);
 
 		$this->testee->register_script(
-			'login-with-oauth',
+			'wp-oauth-login',
 			'js/login.js',
 			[
 				'some-other-script'
@@ -140,7 +195,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_style_is',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 				'registered',
 			],
 			1,
@@ -150,7 +205,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_script_is',
 			[
-				'login-with-oauth-script',
+				'wp-oauth-login-script',
 				'registered',
 			],
 			1,
@@ -160,7 +215,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_style',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 				'https://example.com/assets/build/css/login.css',
 				[],
 				false,
@@ -173,7 +228,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_style',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 			],
 			1,
 			true
@@ -182,7 +237,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_script',
 			[
-				'login-with-oauth-script',
+				'wp-oauth-login-script',
 			],
 			1,
 			true
@@ -202,7 +257,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_style_is',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 				'registered',
 			],
 			1,
@@ -212,7 +267,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_script_is',
 			[
-				'login-with-oauth-script',
+				'wp-oauth-login-script',
 				'registered',
 			],
 			1,
@@ -234,11 +289,11 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_register_style',
 			[
-				'login-with-oauth',
-				'https://example.com/assets/build/css/login.css',
+				'wp-oauth-login',
+				'https://example.com/assets/build/css/button/style.css',
 				[],
 				false,
-				true,
+				'all',
 			],
 			1,
 			true
@@ -247,7 +302,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_style',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 			],
 			1,
 			true
@@ -256,7 +311,7 @@ class AssetsTest extends TestCase {
 		$this->wpMockFunction(
 			'wp_enqueue_script',
 			[
-				'login-with-oauth-script',
+				'wp-oauth-login-script',
 			],
 			1,
 			true

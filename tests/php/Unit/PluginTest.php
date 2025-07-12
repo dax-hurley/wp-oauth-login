@@ -85,7 +85,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-oauth.php'
+				'slashedstring/wp-oauth-login.php'
 			]
 		);
 
@@ -93,7 +93,7 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			1,
-			'login-with-oauth'
+			'wp-oauth-login'
 		);
 
 		$this->testee->run();
@@ -130,7 +130,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-oauth.php'
+				'slashedstring/wp-oauth-login.php'
 			]
 		);
 
@@ -162,7 +162,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-oauth.php'
+				'slashedstring/wp-oauth-login.php'
 			]
 		);
 
@@ -170,7 +170,7 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			1,
-			'login-with-oauth'
+			'wp-oauth-login'
 		);
 
 		$this->testee->run();
@@ -202,7 +202,7 @@ class PluginTest extends TestCase {
 			'plugin_dir_url',
 			[
 				'args'       => [
-					'slashedstring/login-with-oauth.php'
+					'slashedstring/wp-oauth-login.php'
 				],
 				'return_arg' => 0
 			]
@@ -212,12 +212,12 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			1,
-			'login-with-oauth'
+			'wp-oauth-login'
 		);
 
 		$this->testee->run();
 
-		$this->assertSame( 'slashedstring/login-with-oauth.php', $this->testee->url );
+		$this->assertSame( 'slashedstring/wp-oauth-login.php', $this->testee->url );
 	}
 
 	/**
@@ -243,7 +243,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-oauth.php'
+				'slashedstring/wp-oauth-login.php'
 			]
 		);
 
@@ -275,7 +275,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'plugin_dir_url',
 			[
-				'slashedstring/login-with-oauth.php'
+				'slashedstring/wp-oauth-login.php'
 			]
 		);
 
@@ -283,11 +283,11 @@ class PluginTest extends TestCase {
 			'plugin_basename',
 			[],
 			2,
-			'login-with-oauth'
+			'wp-oauth-login'
 		);
 
 		WP_Mock::expectActionAdded( 'init', [ $this->testee, 'load_translations' ] );
-		WP_Mock::expectActionAdded( 'plugin_action_links_' . plugin_basename( $this->testee->path ) . '/login-with-oauth.php', [ $this->testee, 'add_plugin_action_links' ] );
+		WP_Mock::expectActionAdded( 'plugin_action_links_' . plugin_basename( $this->testee->path ) . '/wp-oauth-login.php', [ $this->testee, 'add_plugin_action_links' ] );
 		WP_Mock::expectFilter( 'daxhurley.oauth_login_modules', $this->testee->active_modules );
 
 		$this->testee->run();
@@ -328,7 +328,7 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'load_plugin_textdomain',
 			[
-				'login-with-oauth',
+				'wp-oauth-login',
 				false,
 				'path-to-test/languages/en_US'
 			]
@@ -348,10 +348,10 @@ class PluginTest extends TestCase {
 		$this->wpMockFunction(
 			'admin_url',
 			[
-				'options-general.php?page=login-with-oauth',
+				'options-general.php?page=wp-oauth-login',
 			],
 			1,
-			'http://example.test/wp-admin/options-general.php?page=login-with-oauth'
+			'http://example.test/wp-admin/options-general.php?page=wp-oauth-login'
 		);
 
 		$actions = $this->testee->add_plugin_action_links( [] );
@@ -361,7 +361,7 @@ class PluginTest extends TestCase {
 		$this->assertIsArray( $actions, 'Plugin actions should be an array.');
 		$this->assertArrayHasKey( 'settings', $actions, 'Setting plugin action should exists.' );
 		$this->assertEquals(
-			'<a href="http://example.test/wp-admin/options-general.php?page=login-with-oauth">Settings</a>',
+			'<a href="http://example.test/wp-admin/options-general.php?page=wp-oauth-login">Settings</a>',
 			$actions['settings'],
 			'Setting plugin action link is created.'
 		);

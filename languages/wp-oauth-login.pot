@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP OAuth Login 1.4.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/login-with-oauth\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-oauth-login\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -12,10 +12,10 @@ msgstr ""
 "POT-Creation-Date: 2025-05-15T07:44:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0-alpha\n"
-"X-Domain: login-with-oauth\n"
+"X-Domain: wp-oauth-login\n"
 
 #. Plugin Name of the plugin
-#: login-with-oauth.php
+#: wp-oauth-login.php
 #: src/Modules/Settings.php:315
 #: templates/oauth-login-button.php:14
 #: assets/build/blocks/login-button/index.js:1
@@ -23,26 +23,26 @@ msgid "WP OAuth Login"
 msgstr ""
 
 #. Description of the plugin
-#: login-with-oauth.php
+#: wp-oauth-login.php
 msgid "Allow users to login/register via OAuth."
 msgstr ""
 
 #. Author of the plugin
-#: login-with-oauth.php
+#: wp-oauth-login.php
 msgid "rtCamp"
 msgstr ""
 
 #. Author URI of the plugin
-#: login-with-oauth.php
-msgid "https://daxhurley.com"
+#: wp-oauth-login.php
+msgid "https://github.com/dax-hurley"
 msgstr ""
 
-#: login-with-oauth.php:40
-msgid "Login with oauth Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version"
+#: wp-oauth-login.php:40
+msgid "WP OAuth Login Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version"
 msgstr ""
 
-#: login-with-oauth.php:47
-msgid "The plugin Login with oauth has been deactivated"
+#: wp-oauth-login.php:47
+msgid "The plugin WP OAuth Login has been deactivated"
 msgstr ""
 
 #. translators: %$s is replaced with requested service name.
@@ -124,7 +124,7 @@ msgid "WP OAuth Login settings"
 msgstr ""
 
 #: src/Modules/Shortcode.php:92
-msgid "Login with oauth"
+msgid "WP OAuth Login"
 msgstr ""
 
 #: src/Plugin.php:160

@@ -55,7 +55,7 @@ class Authenticator {
 	 */
 	public function authenticate( stdClass $user ): WP_User {
 		if ( ! property_exists( $user, 'email' ) ) {
-			throw new InvalidArgumentException( esc_html__( 'Email needs to be present for the user.', 'login-with-oauth' ) );
+			throw new InvalidArgumentException( esc_html__( 'Email needs to be present for the user.', 'wp-oauth-login' ) );
 		}
 
 		if ( email_exists( $user->email ) ) {
@@ -96,7 +96,7 @@ class Authenticator {
 		$register = true === (bool) $this->settings->registration_enabled || (bool) get_option( 'users_can_register', false );
 
 		if ( ! $register ) {
-			throw new Exception( esc_html__( 'Registration is not allowed.', 'login-with-oauth' ) );
+			throw new Exception( esc_html__( 'Registration is not allowed.', 'wp-oauth-login' ) );
 		}
 
 		try {
@@ -121,7 +121,7 @@ class Authenticator {
 			}
 
 			/* translators: %s is replaced with email ID of user trying to register */
-			throw new Exception( sprintf( __( 'Cannot register with this email: %s', 'login-with-oauth' ), $user->email ) );
+			throw new Exception( sprintf( __( 'Cannot register with this email: %s', 'wp-oauth-login' ), $user->email ) );
 
 		} catch ( Throwable $e ) {
 

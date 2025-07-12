@@ -22,6 +22,7 @@ use Exception;
 use DaxHurley\OAuthLogin\Utils\Helper;
 use DaxHurley\OAuthLogin\Utils\OAuthClient;
 use DaxHurley\OAuthLogin\Utils\Authenticator;
+use DaxHurley\OAuthLogin\Utils\ProviderManager;
 use DaxHurley\OAuthLogin\Interfaces\Module as ModuleInterface;
 use function DaxHurley\OAuthLogin\plugin;
 
@@ -36,7 +37,7 @@ class Login implements ModuleInterface {
 	 *
 	 * @var OAuthClient
 	 */
-	private $gh_client;
+	private $oauth_client;
 
 	/**
 	 * Authenticator instance.
@@ -44,6 +45,13 @@ class Login implements ModuleInterface {
 	 * @var Authenticator
 	 */
 	private $authenticator;
+
+	/**
+	 * Provider manager instance.
+	 *
+	 * @var ProviderManager
+	 */
+	private $provider_manager;
 
 	/**
 	 * Flag for determining whether the user has been authenticated
@@ -56,12 +64,13 @@ class Login implements ModuleInterface {
 	/**
 	 * Login constructor.
 	 *
-	 * @param OAuthClient  $client GH Client object.
+	 * @param OAuthClient  $client OAuth Client object.
 	 * @param Authenticator $authenticator Settings object.
 	 */
 	public function __construct( OAuthClient $client, Authenticator $authenticator ) {
-		$this->gh_client     = $client;
+		$this->oauth_client     = $client;
 		$this->authenticator = $authenticator;
+		$this->provider_manager = plugin()->container()->get( 'provider_manager' );
 	}
 
 	/**
@@ -95,13 +104,24 @@ class Login implements ModuleInterface {
 	 * @return void
 	 */
 	public function login_button(): void {
-		$template  = trailingslashit( plugin()->template_dir ) . 'oauth-login-button.php';
-		$login_url = plugin()->container()->get( 'gh_client' )->authorization_url();
+		$configured_providers = $this->provider_manager->get_configured_providers();
+		
+		if ( empty( $configured_providers ) ) {
+			return;
+		}
+
+		$template = trailingslashit( plugin()->template_dir ) . 'oauth-login-button.php';
+		
+		// For now, use the first configured provider
+		// In the future, we could show multiple buttons for different providers
+		$first_provider = reset( $configured_providers );
+		$login_url = $first_provider->get_authorization_url_with_params();
 
 		Helper::render_template(
 			$template,
 			[
 				'login_url' => $login_url,
+				'provider_name' => $first_provider->get_display_name(),
 			]
 		);
 	}
@@ -128,7 +148,7 @@ class Login implements ModuleInterface {
 		$state         = Helper::filter_input( INPUT_GET, 'state', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$decoded_state = $state ? (array) ( json_decode( base64_decode( $state ) ) ) : null;    // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 
-		if ( ! is_array( $decoded_state ) || empty( $decoded_state['provider'] ) || 'oauth' !== $decoded_state['provider'] ) {
+		if ( ! is_array( $decoded_state ) || empty( $decoded_state['provider'] ) ) {
 			return $user;
 		}
 
@@ -136,16 +156,24 @@ class Login implements ModuleInterface {
 			return $user;
 		}
 
+		// Get the provider from the state
+		$provider = $this->provider_manager->get_provider( $decoded_state['provider'] );
+		if ( ! $provider ) {
+			return $user;
+		}
+
 		try {
-			$this->gh_client->set_access_token( $code );
-			$user = $this->gh_client->user();
+			// Create a new OAuth client for this specific provider
+			$oauth_client = new OAuthClient( $provider );
+			$oauth_client->set_access_token( $code );
+			$user = $oauth_client->user();
 			$user = $this->authenticator->authenticate( $user );
 
 			if ( $user instanceof WP_User ) {
 				$this->authenticated = true;
 
 				/**
-				 * Fires once the user has been authenticated via OAuth OAuth.
+				 * Fires once the user has been authenticated via OAuth.
 				 *
 				 * @since 1.3.0
 				 *
@@ -225,7 +253,7 @@ class Login implements ModuleInterface {
 		$state = base64_decode( $state );
 		$state = $state ? json_decode( $state ) : null;
 
-		if ( ( $state instanceof stdClass ) && ! empty( $state->provider ) && 'oauth' === $state->provider && ! empty( $state->redirect_to ) ) {
+		if ( ( $state instanceof stdClass ) && ! empty( $state->provider ) && ! empty( $state->redirect_to ) ) {
 			wp_safe_redirect( $state->redirect_to, 302, 'WP OAuth Login' );
 			exit;
 		}

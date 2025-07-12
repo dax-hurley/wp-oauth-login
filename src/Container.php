@@ -25,6 +25,7 @@ use DaxHurley\OAuthLogin\Modules\OneTapLogin;
 use DaxHurley\OAuthLogin\Modules\Settings;
 use DaxHurley\OAuthLogin\Utils\Authenticator;
 use DaxHurley\OAuthLogin\Utils\OAuthClient;
+use DaxHurley\OAuthLogin\Utils\ProviderManager;
 use DaxHurley\OAuthLogin\Modules\Shortcode;
 use DaxHurley\OAuthLogin\Utils\TokenVerifier;
 
@@ -85,6 +86,15 @@ class Container implements ContainerInterface {
 	 */
 	public function define_services(): void {
 		/**
+		 * Define Provider Manager service.
+		 *
+		 * @return ProviderManager
+		 */
+		$this->container['provider_manager'] = function () {
+			return new ProviderManager();
+		};
+
+		/**
 		 * Define Settings service to add settings page and retrieve setting values.
 		 *
 		 * @return Settings
@@ -101,26 +111,34 @@ class Container implements ContainerInterface {
 		 * @return Login
 		 */
 		$this->container['login_flow'] = function ( PimpleContainer $c ) {
-			return new Login( $c['gh_client'], $c['authenticator'] );
+			return new Login( $c['oauth_client'], $c['authenticator'] );
 		};
 
 		/**
-		 * Define a service for OAuth OAuth client.
+		 * Define a service for OAuth client.
 		 *
 		 * @param PimpleContainer $c Pimple container instance.
 		 *
 		 * @return OAuthClient
 		 */
-		$this->container['gh_client'] = function ( PimpleContainer $c ) {
-			$settings = $c['settings'];
+		$this->container['oauth_client'] = function ( PimpleContainer $c ) {
+			$provider_manager = $c['provider_manager'];
+			$first_provider = $provider_manager->get_first_configured_provider();
+			
+			if ( ! $first_provider ) {
+				// Create a dummy provider for backward compatibility
+				$first_provider = new \DaxHurley\OAuthLogin\Providers\GenericProvider( [
+					'name' => 'default',
+					'display_name' => __( 'Default Provider', 'login-with-oauth' ),
+					'authorization_url' => '',
+					'token_url' => '',
+					'user_info_url' => '',
+					'client_id' => '',
+					'client_secret' => '',
+				] );
+			}
 
-			return new OAuthClient(
-				[
-					'client_id'     => $settings->client_id,
-					'client_secret' => $settings->client_secret,
-					'redirect_uri'  => wp_login_url(),
-				]
-			);
+			return new OAuthClient( $first_provider );
 		};
 
 		/**
@@ -140,7 +158,7 @@ class Container implements ContainerInterface {
 		 * @return Shortcode
 		 */
 		$this->container['shortcode'] = function ( PimpleContainer $c ) {
-			return new Shortcode( $c['gh_client'], $c['assets'] );
+			return new Shortcode( $c['oauth_client'], $c['assets'] );
 		};
 
 		/**
@@ -164,7 +182,7 @@ class Container implements ContainerInterface {
 		 * @return OneTapLogin
 		 */
 		$this->container['one_tap_login'] = function ( PimpleContainer $c ) {
-			return new OneTapLogin( $c['settings'], $c['token_verifier'], $c['gh_client'], $c['authenticator'] );
+			return new OneTapLogin( $c['settings'], $c['token_verifier'], $c['oauth_client'], $c['authenticator'] );
 		};
 
 		/**
@@ -186,7 +204,7 @@ class Container implements ContainerInterface {
 		 * @return Block
 		 */
 		$this->container['oauth_login_block'] = function ( PimpleContainer $c ) {
-			return new Block( $c['assets'], $c['gh_client'] );
+			return new Block( $c['assets'], $c['oauth_client'] );
 		};
 
 

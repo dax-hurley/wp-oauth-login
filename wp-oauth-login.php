@@ -3,9 +3,9 @@
  * Plugin Name: WP OAuth Login
  * Description: Allow users to login/register via OAuth.
  * Version: 1.4.0
- * Author: rtCamp
- * Author URI: https://daxhurley.com
- * Text Domain: login-with-oauth
+ * Author: Dax Hurley
+ * Author URI: https://github.com/dax-hurley
+ * Text Domain: wp-oauth-login
  * Domain Path: /languages
  * License: GPLv2+
  * Requires at least: 5.5
@@ -38,15 +38,15 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 			$hook,
 			function () {
 				$message = __(
-					'Login with oauth Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version',
-					'login-with-oauth'
+					'WP OAuth Login Plugin requires PHP version 7.4 or higher. <br />Please ask your server administrator to update your environment to latest PHP version',
+					'wp-oauth-login'
 				);
 
 				printf(
 					'<div class="notice notice-error"><span class="notice-title">%1$s</span><p>%2$s</p></div>',
 					esc_html__(
-						'The plugin Login with oauth has been deactivated',
-						'login-with-oauth'
+						'The plugin WP OAuth Login has been deactivated',
+						'wp-oauth-login'
 					),
 					wp_kses( $message, [ 'br' => true ] )
 				);
