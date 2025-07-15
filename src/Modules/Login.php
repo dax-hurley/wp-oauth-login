@@ -122,6 +122,7 @@ class Login implements ModuleInterface {
 			[
 				'login_url' => $login_url,
 				'provider_name' => $first_provider->get_display_name(),
+				'provider_config' => $first_provider->get_config(),
 			]
 		);
 	}

@@ -420,6 +420,18 @@ class Settings implements ModuleInterface {
 						$('#supports_one_tap').prop('checked', config.supports_one_tap || false);
 						$('#certs_url').val(config.certs_url || '');
 						$('#valid_issuers').val(config.valid_issuers || '');
+						$('#button_icon').val(config.button_icon || '');
+						$('#button_color').val(config.button_color || '');
+						
+						// Update icon preview if icon exists
+						if (config.button_icon) {
+							$('#button_icon_preview img').attr('src', config.button_icon);
+							$('#button_icon_preview').show();
+							$('.upload-icon').hide();
+						} else {
+							$('#button_icon_preview').hide();
+							$('.upload-icon').show();
+						}
 						
 						// Change form title and button text
 						$('.oauth-provider-form h3').text('<?php esc_html_e( 'Edit Provider', 'wp-oauth-login' ); ?>');
@@ -480,6 +492,45 @@ class Settings implements ModuleInterface {
 				$('#redirect_uri').val('<?php echo esc_js( wp_login_url() ); ?>');
 				$('#default_scopes').val('email profile');
 				$('#supports_one_tap').prop('checked', false);
+				
+				// Reset icon preview
+				$('#button_icon').val('');
+				$('#button_icon_preview').hide();
+				$('.upload-icon').show();
+			});
+
+			// Handle icon upload
+			$('.upload-icon').on('click', function(e) {
+				e.preventDefault();
+				
+				var frame = wp.media({
+					title: '<?php esc_html_e( 'Select Icon', 'wp-oauth-login' ); ?>',
+					button: {
+						text: '<?php esc_html_e( 'Use this icon', 'wp-oauth-login' ); ?>'
+					},
+					multiple: false,
+					library: {
+						type: 'image'
+					}
+				});
+
+				frame.on('select', function() {
+					var attachment = frame.state().get('selection').first().toJSON();
+					$('#button_icon').val(attachment.url);
+					$('#button_icon_preview img').attr('src', attachment.url);
+					$('#button_icon_preview').show();
+					$('.upload-icon').hide();
+				});
+
+				frame.open();
+			});
+
+			// Handle icon removal
+			$('.remove-icon').on('click', function(e) {
+				e.preventDefault();
+				$('#button_icon').val('');
+				$('#button_icon_preview').hide();
+				$('.upload-icon').show();
 			});
 		});
 		</script>
@@ -580,8 +631,8 @@ class Settings implements ModuleInterface {
 						<label for="user_info_url"><?php esc_html_e( 'User Info URL', 'wp-oauth-login' ); ?></label>
 					</th>
 					<td>
-						<input type="url" id="user_info_url" name="user_info_url" class="regular-text" required />
-						<p class="description"><?php esc_html_e( 'The user info endpoint URL (e.g., https://api.provider.com/user)', 'wp-oauth-login' ); ?></p>
+						<input type="url" id="user_info_url" name="user_info_url" class="regular-text" />
+						<p class="description"><?php esc_html_e( 'The user info endpoint URL (e.g., https://api.provider.com/user). Leave empty if user info is included in the ID token.', 'wp-oauth-login' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -647,6 +698,31 @@ class Settings implements ModuleInterface {
 						<p class="description"><?php esc_html_e( 'Comma-separated list of valid JWT issuers (optional, for ID token verification)', 'wp-oauth-login' ); ?></p>
 					</td>
 				</tr>
+				<tr>
+					<th scope="row">
+						<label for="button_icon"><?php esc_html_e( 'Button Icon', 'wp-oauth-login' ); ?></label>
+					</th>
+					<td>
+						<div class="button-icon-upload">
+							<input type="hidden" id="button_icon" name="button_icon" class="regular-text" />
+							<div id="button_icon_preview" class="icon-preview" style="display: none;">
+								<img src="" alt="" style="max-width: 25px; max-height: 25px; margin-right: 10px;" />
+								<button type="button" class="button remove-icon"><?php esc_html_e( 'Remove', 'wp-oauth-login' ); ?></button>
+							</div>
+							<button type="button" class="button upload-icon"><?php esc_html_e( 'Upload Icon', 'wp-oauth-login' ); ?></button>
+						</div>
+						<p class="description"><?php esc_html_e( 'Upload a custom icon for the login button (optional). Recommended size: 25x25px.', 'wp-oauth-login' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="button_color"><?php esc_html_e( 'Button Color', 'wp-oauth-login' ); ?></label>
+					</th>
+					<td>
+						<input type="color" id="button_color" name="button_color" class="color-picker" />
+						<p class="description"><?php esc_html_e( 'Custom background color for the login button (optional).', 'wp-oauth-login' ); ?></p>
+					</td>
+				</tr>
 			</table>
 			<?php submit_button( __( 'Add Provider', 'wp-oauth-login' ) ); ?>
 			<button type="button" id="reset-form" class="button button-secondary" style="margin-left: 10px;"><?php esc_html_e( 'Reset Form', 'wp-oauth-login' ); ?></button>
@@ -680,6 +756,8 @@ class Settings implements ModuleInterface {
 			'supports_one_tap' => isset( $_POST['supports_one_tap'] ) ? true : false,
 			'certs_url' => esc_url_raw( $_POST['certs_url'] ?? '' ),
 			'valid_issuers' => sanitize_text_field( $_POST['valid_issuers'] ?? '' ),
+			'button_icon' => esc_url_raw( $_POST['button_icon'] ?? '' ),
+			'button_color' => sanitize_hex_color( $_POST['button_color'] ?? '' ),
 		];
 
 		// Process valid issuers if provided

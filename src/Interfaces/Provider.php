@@ -136,9 +136,10 @@ interface Provider {
 	 * Get user information using access token.
 	 *
 	 * @param string $access_token Access token.
+	 * @param \stdClass|null $token_response Full token response (optional).
 	 * @return \stdClass
 	 */
-	public function get_user_info( string $access_token ): \stdClass;
+	public function get_user_info( string $access_token, ?\stdClass $token_response = null ): \stdClass;
 
 	/**
 	 * Get the provider's settings fields.

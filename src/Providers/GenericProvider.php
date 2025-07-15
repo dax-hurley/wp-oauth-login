@@ -69,8 +69,8 @@ class GenericProvider extends AbstractProvider {
 			'user_info_url' => [
 				'label'       => __( 'User Info URL', 'wp-oauth-login' ),
 				'type'        => 'url',
-				'description' => __( 'The user info endpoint URL (e.g., https://api.provider.com/user)', 'wp-oauth-login' ),
-				'required'    => true,
+				'description' => __( 'The user info endpoint URL (e.g., https://api.provider.com/user). Leave empty if user info is included in the ID token.', 'wp-oauth-login' ),
+				'required'    => false,
 			],
 			'client_id' => [
 				'label'       => __( 'Client ID', 'wp-oauth-login' ),
@@ -106,6 +106,16 @@ class GenericProvider extends AbstractProvider {
 				'type'        => 'text',
 				'description' => __( 'Comma-separated list of valid JWT issuers (optional, for ID token verification)', 'wp-oauth-login' ),
 			],
+			'button_icon' => [
+				'label'       => __( 'Button Icon', 'wp-oauth-login' ),
+				'type'        => 'image',
+				'description' => __( 'Upload a custom icon for the login button (optional). Recommended size: 25x25px.', 'wp-oauth-login' ),
+			],
+			'button_color' => [
+				'label'       => __( 'Button Color', 'wp-oauth-login' ),
+				'type'        => 'color',
+				'description' => __( 'Custom background color for the login button (optional).', 'wp-oauth-login' ),
+			],
 		];
 	}
 
@@ -115,7 +125,7 @@ class GenericProvider extends AbstractProvider {
 	 * @return bool
 	 */
 	public function validate_config(): bool {
-		$required_fields = [ 'name', 'display_name', 'authorization_url', 'token_url', 'user_info_url', 'client_id', 'client_secret' ];
+		$required_fields = [ 'name', 'display_name', 'authorization_url', 'token_url', 'client_id', 'client_secret' ];
 		
 		foreach ( $required_fields as $field ) {
 			if ( empty( $this->config[ $field ] ) ) {
@@ -132,7 +142,8 @@ class GenericProvider extends AbstractProvider {
 			return false;
 		}
 
-		if ( ! filter_var( $this->config['user_info_url'], FILTER_VALIDATE_URL ) ) {
+		// User info URL is optional, but if provided, it should be a valid URL
+		if ( ! empty( $this->config['user_info_url'] ) && ! filter_var( $this->config['user_info_url'], FILTER_VALIDATE_URL ) ) {
 			return false;
 		}
 

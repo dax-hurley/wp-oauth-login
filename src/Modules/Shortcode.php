@@ -102,6 +102,8 @@ class Shortcode implements ModuleInterface {
 				'force_display' => 'no',
 				'redirect_to'   => $redirect_to,
 				'provider'      => '',
+				'css_classes'   => '',
+				'disable_styles' => 'no',
 			],
 			$attrs,
 			self::TAG
@@ -130,9 +132,16 @@ class Shortcode implements ModuleInterface {
 		if ( $provider ) {
 			$attrs['login_url'] = $provider->get_authorization_url_with_params();
 			$attrs['provider_name'] = $provider->get_display_name();
+			$attrs['provider_config'] = $provider->get_config();
 		} else {
 			$attrs['login_url'] = '';
 			$attrs['provider_name'] = '';
+			$attrs['provider_config'] = [];
+		}
+
+		// Map button_text to custom_btn_text for template compatibility
+		if ( isset( $attrs['button_text'] ) ) {
+			$attrs['custom_btn_text'] = $attrs['button_text'];
 		}
 
 		Helper::remove_redirect_state_filter();

@@ -36,6 +36,13 @@ class OAuthClient {
 	private $access_token;
 
 	/**
+	 * Full token response.
+	 *
+	 * @var \stdClass|null
+	 */
+	private $token_response;
+
+	/**
 	 * OAuthClient constructor.
 	 *
 	 * @param ProviderInterface $provider Provider instance.
@@ -73,8 +80,8 @@ class OAuthClient {
 	 */
 	public function set_access_token( string $code ): self {
 		try {
-			$token_response = $this->provider->exchange_code_for_token( $code );
-			$this->access_token = $token_response->access_token;
+			$this->token_response = $this->provider->exchange_code_for_token( $code );
+			$this->access_token = $this->token_response->access_token;
 
 			return $this;
 		} catch ( \Throwable $e ) {
@@ -121,7 +128,7 @@ class OAuthClient {
 	 */
 	public function user(): \stdClass {
 		try {
-			return $this->provider->get_user_info( $this->access_token );
+			return $this->provider->get_user_info( $this->access_token, $this->token_response );
 		} catch ( \Throwable $e ) {
 			throw $e;
 		}

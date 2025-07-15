@@ -292,10 +292,81 @@ abstract class AbstractProvider implements ProviderInterface {
 	 * Get user information using access token.
 	 *
 	 * @param string $access_token Access token.
+	 * @param \stdClass|null $token_response Full token response (optional).
 	 * @return \stdClass
 	 * @throws Exception API Exception.
 	 */
-	public function get_user_info( string $access_token ): \stdClass {
+	public function get_user_info( string $access_token, ?\stdClass $token_response = null ): \stdClass {
+		// If no user info URL is configured, try to extract user info from ID token
+		if ( empty( $this->get_user_info_url() ) ) {
+			return $this->get_user_info_from_token( $access_token, $token_response );
+		}
+
+		// Try different methods to get user info
+		$user_info = $this->try_get_user_info_with_authorization_header( $access_token );
+		
+		if ( ! $user_info ) {
+			$user_info = $this->try_get_user_info_with_query_param( $access_token );
+		}
+
+		if ( ! $user_info ) {
+			// Log the failure for debugging
+			$this->log_user_info_failure( $access_token );
+			throw new Exception( esc_html__( 'Could not retrieve the user information. Please check your User Info URL configuration and try again.', 'wp-oauth-login' ) );
+		}
+
+		return $user_info;
+	}
+
+	/**
+	 * Try to get user info using Authorization header (Bearer token).
+	 *
+	 * @param string $access_token Access token.
+	 * @return \stdClass|null
+	 */
+	private function try_get_user_info_with_authorization_header( string $access_token ): ?\stdClass {
+		$user = wp_remote_get(
+			$this->get_user_info_url(),
+			[
+				'headers' => [
+					'Accept' => 'application/json',
+					'Authorization' => 'Bearer ' . $access_token,
+				],
+			]
+		);
+
+		$response_code = wp_remote_retrieve_response_code( $user );
+		
+		if ( 200 === $response_code ) {
+			$body = wp_remote_retrieve_body( $user );
+			$data = json_decode( $body );
+			
+			if ( $data && is_object( $data ) ) {
+				return $data;
+			}
+		}
+
+		// Log the failure for debugging
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$body = wp_remote_retrieve_body( $user );
+			error_log( sprintf(
+				'[WP OAuth Login] Authorization header method failed for provider "%s". Response code: %d, Body: %s',
+				$this->get_name(),
+				$response_code,
+				substr( $body, 0, 500 )
+			) );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Try to get user info using access token as query parameter.
+	 *
+	 * @param string $access_token Access token.
+	 * @return \stdClass|null
+	 */
+	private function try_get_user_info_with_query_param( string $access_token ): ?\stdClass {
 		$user = wp_remote_get(
 			$this->get_user_info_url() . '?access_token=' . $access_token,
 			[
@@ -305,11 +376,156 @@ abstract class AbstractProvider implements ProviderInterface {
 			]
 		);
 
-		if ( 200 !== wp_remote_retrieve_response_code( $user ) ) {
-			throw new Exception( esc_html__( 'Could not retrieve the user information, please try again.', 'wp-oauth-login' ) );
+		$response_code = wp_remote_retrieve_response_code( $user );
+		
+		if ( 200 === $response_code ) {
+			$body = wp_remote_retrieve_body( $user );
+			$data = json_decode( $body );
+			
+			if ( $data && is_object( $data ) ) {
+				return $data;
+			}
 		}
 
-		return json_decode( wp_remote_retrieve_body( $user ) );
+		// Log the failure for debugging
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$body = wp_remote_retrieve_body( $user );
+			error_log( sprintf(
+				'[WP OAuth Login] Query parameter method failed for provider "%s". Response code: %d, Body: %s',
+				$this->get_name(),
+				$response_code,
+				substr( $body, 0, 500 )
+			) );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Try to extract user info from ID token if available.
+	 *
+	 * @param string $access_token Access token.
+	 * @param \stdClass|null $token_response Full token response.
+	 * @return \stdClass
+	 * @throws Exception If no user info can be extracted.
+	 */
+	private function get_user_info_from_token( string $access_token, ?\stdClass $token_response = null ): \stdClass {
+		// Try to extract user info from ID token if available
+		if ( $token_response && isset( $token_response->id_token ) ) {
+			$user_info = $this->extract_user_info_from_id_token( $token_response->id_token );
+			if ( $user_info ) {
+				return $user_info;
+			}
+		}
+
+		// Try to extract user info from access token response
+		if ( $token_response ) {
+			$user_info = $this->extract_user_info_from_token_response( $token_response );
+			if ( $user_info ) {
+				return $user_info;
+			}
+		}
+
+		throw new Exception( esc_html__( 'User Info URL is required for this provider. Please configure it in the provider settings.', 'wp-oauth-login' ) );
+	}
+
+	/**
+	 * Extract user info from ID token.
+	 *
+	 * @param string $id_token ID token.
+	 * @return \stdClass|null
+	 */
+	private function extract_user_info_from_id_token( string $id_token ): ?\stdClass {
+		$token_parts = explode( '.', $id_token );
+		
+		if ( count( $token_parts ) !== 3 ) {
+			return null;
+		}
+
+		$payload = json_decode( base64_decode( str_replace( [ '-', '_' ], [ '+', '/' ], $token_parts[1] ) ) );
+		
+		if ( ! $payload || ! is_object( $payload ) ) {
+			return null;
+		}
+
+		// Extract common user fields from ID token
+		$user_info = new \stdClass();
+		
+		// Map common ID token fields to user info fields
+		$field_mapping = [
+			'sub' => 'id',
+			'email' => 'email',
+			'email_verified' => 'email_verified',
+			'name' => 'name',
+			'given_name' => 'given_name',
+			'family_name' => 'family_name',
+			'picture' => 'picture',
+			'preferred_username' => 'login',
+		];
+
+		foreach ( $field_mapping as $token_field => $user_field ) {
+			if ( isset( $payload->$token_field ) ) {
+				$user_info->$user_field = $payload->$token_field;
+			}
+		}
+
+		// Ensure we have at least an email or ID
+		if ( ! isset( $user_info->email ) && ! isset( $user_info->id ) ) {
+			return null;
+		}
+
+		return $user_info;
+	}
+
+	/**
+	 * Extract user info from token response.
+	 *
+	 * @param \stdClass $token_response Token response.
+	 * @return \stdClass|null
+	 */
+	private function extract_user_info_from_token_response( \stdClass $token_response ): ?\stdClass {
+		// Some providers include user info directly in the token response
+		$user_info = new \stdClass();
+		
+		// Map common token response fields to user info fields
+		$field_mapping = [
+			'user_id' => 'id',
+			'email' => 'email',
+			'name' => 'name',
+			'given_name' => 'given_name',
+			'family_name' => 'family_name',
+		];
+
+		foreach ( $field_mapping as $response_field => $user_field ) {
+			if ( isset( $token_response->$response_field ) ) {
+				$user_info->$user_field = $token_response->$response_field;
+			}
+		}
+
+		// Ensure we have at least an email or ID
+		if ( ! isset( $user_info->email ) && ! isset( $user_info->id ) ) {
+			return null;
+		}
+
+		return $user_info;
+	}
+
+	/**
+	 * Log user info retrieval failure for debugging.
+	 *
+	 * @param string $access_token Access token (will be masked).
+	 * @return void
+	 */
+	private function log_user_info_failure( string $access_token ): void {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$masked_token = substr( $access_token, 0, 10 ) . '...' . substr( $access_token, -10 );
+			error_log( sprintf(
+				'[WP OAuth Login] User info retrieval failed for provider "%s" with URL "%s". Access token: %s',
+				$this->get_name(),
+				$this->get_user_info_url(),
+				$masked_token
+			) );
+		}
 	}
 
 	/**

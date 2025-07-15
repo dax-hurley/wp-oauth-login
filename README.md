@@ -44,6 +44,8 @@ This is a fork of [login with google](https://github.com/rtCamp/login-with-googl
    - **Supports One-Tap Login**: Check if provider supports one-tap login
    - **Certificates URL**: URL for JWT certificate verification (optional)
    - **Valid Issuers**: Comma-separated list of valid JWT issuers (optional)
+   - **Button Icon**: Upload a custom icon for the login button (optional)
+   - **Button Color**: Custom background color for the login button (optional)
 
 3. Click "Add Provider"
 
@@ -61,7 +63,8 @@ Client Secret: [Your GitHub OAuth App Client Secret]
 Redirect URI: https://yourdomain.com/wp-login.php
 Default Scopes: user:email read:user
 Supports One-Tap Login: [Leave unchecked]
-```
+Button Icon: [Upload custom icon]
+Button Color: [Choose custom color]
 
 #### Microsoft Azure AD
 ```
@@ -77,7 +80,8 @@ Default Scopes: openid profile email
 Supports One-Tap Login: [Leave unchecked]
 Certificates URL: https://login.microsoftonline.com/{tenant-id}/discovery/v2.0/keys
 Valid Issuers: https://login.microsoftonline.com/{tenant-id}/v2.0
-```
+Button Icon: [Upload custom icon]
+Button Color: [Choose custom color]
 
 #### Custom OAuth Server
 ```
@@ -93,7 +97,8 @@ Default Scopes: email profile
 Supports One-Tap Login: [Leave unchecked]
 Certificates URL: https://auth.mycompany.com/.well-known/jwks.json
 Valid Issuers: https://auth.mycompany.com
-```
+Button Icon: [Upload custom icon]
+Button Color: [Choose custom color]
 
 ## Usage
 
@@ -111,11 +116,44 @@ With custom options:
 [oauth_login provider="github" button_text="Login with GitHub" redirect_to="/dashboard"]
 ```
 
+With styling options:
+
+```php
+[oauth_login provider="github" css_classes="my-custom-class" disable_styles="yes"]
+```
+
+#### Shortcode Attributes
+
+- `provider`: Specify which OAuth provider to use
+- `button_text`: Custom text for the login button
+- `redirect_to`: URL to redirect to after login
+- `force_display`: Set to "yes" to show button even when user is logged in
+- `css_classes`: Additional CSS classes to apply to the button container
+- `disable_styles`: Set to "yes" to disable default plugin styling
+
 ### Gutenberg Block
 
 1. Add the "OAuth Login Button" block in the block editor
 2. Configure the button text and display options
 3. The block will automatically use the first configured provider
+
+### Button Customization
+
+Each OAuth provider can be customized with:
+
+- **Custom Icon**: Upload a custom icon (recommended size: 25x25px) that will replace the default icon
+- **Custom Color**: Set a custom background color for the login button
+
+These customizations will be applied to all instances of the provider's login button (shortcode, block, and default login page).
+
+**Note**: Icons are only displayed if a custom icon is uploaded for the provider. By default, no icon is shown.
+
+### Styling Behavior
+
+- **Default WordPress Login Page**: Full styling with margins and spacing
+- **Shortcode and Block Usage**: No margins or spacing (clean integration)
+- **Disabled Styles**: When `disable_styles="yes"` is used, only basic styling is applied
+- **Custom CSS Classes**: Additional classes can be added via the `css_classes` attribute
 
 ### Programmatic Usage
 

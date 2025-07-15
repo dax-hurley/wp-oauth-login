@@ -7,6 +7,11 @@ $white_color: #FFFFFF;
 	margin: 40px auto 0 auto;
 	clear: both;
 
+	// Remove spacing for shortcode and block usage
+	&--shortcode {
+		margin: 0;
+	}
+
 	&.hidden {
 		display: none;
 	}
@@ -78,5 +83,54 @@ $white_color: #FFFFFF;
 		background-size: contain;
 		vertical-align: middle;
 		margin-right: 10px;
+	}
+
+	// When styles are disabled, apply a strong reset
+	&--no-styles,
+	&--no-styles * {
+		all: unset !important;
+		box-sizing: border-box !important;
+		display: revert !important;
+	}
+
+	&--no-styles {
+		background: none !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		border: none !important;
+		width: auto !important;
+		color: inherit !important;
+		font: inherit !important;
+
+		.wp_oauth_login__button-container {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+
+		.wp_oauth_login__button {
+			display: inline-block !important;
+			text-decoration: none !important;
+			padding: 0 !important;
+			border: none !important;
+			border-radius: 0 !important;
+			background: none !important;
+			color: inherit !important;
+			font: inherit !important;
+			font-size: inherit !important;
+			line-height: inherit !important;
+			box-shadow: none !important;
+			margin: 0 !important;
+			width: auto !important;
+			text-align: left !important;
+		}
+
+		.wp_oauth_login__oauth-icon {
+			background: none !important;
+			margin: 0 !important;
+			width: 1em !important;
+			height: 1em !important;
+			display: inline-block !important;
+			vertical-align: middle !important;
+		}
 	}
 }

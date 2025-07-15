@@ -143,11 +143,13 @@ class Block implements Module {
 			$provider = $this->provider_manager->get_first_configured_provider();
 			$login_url = $provider ? $provider->get_authorization_url_with_params() : '#';
 			$provider_name = $provider ? $provider->get_display_name() : '';
+			$provider_config = $provider ? $provider->get_config() : [];
 
 			$markup = $this->markup(
 				[
 					'login_url'           => $login_url,
 					'provider_name'       => $provider_name,
+					'provider_config'     => $provider_config,
 					'custom_btn_text'     => $attributes['buttonText'] ?? false,
 					'force_display_block' => $attributes['forceDisplay'] ?? false,
 				]
